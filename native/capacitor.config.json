@@ -1,0 +1,7 @@
+{
+  "appId": "BUNDLE_ID_EINTRAGEN",
+  "appName": "VUNO",
+  "webDir": "../app",
+  "ios": { "contentInset": "automatic" },
+  "android": { "allowMixedContent": false }
+}

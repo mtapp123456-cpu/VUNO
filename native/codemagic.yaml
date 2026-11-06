@@ -1,0 +1,44 @@
+# ENTWURF, noch ungetestet. Erst ausfüllen, wenn Konten und Bundle-ID stehen.
+workflows:
+  vuno-ios:
+    name: VUNO iOS
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: APP_STORE_CONNECT_KEY_NAME
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: BUNDLE_ID_EINTRAGEN
+      node: 22
+      xcode: latest
+    scripts:
+      - name: Abhängigkeiten
+        script: cd native && npm install
+      - name: iOS-Projekt erzeugen
+        script: cd native && (test -d ios || npx cap add ios) && npx cap sync ios
+      - name: Signatur setzen
+        script: xcode-project use-profiles
+      - name: Bauen
+        script: cd native/ios/App && pod install && xcode-project build-ipa --workspace App.xcworkspace --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+  vuno-android:
+    name: VUNO Android
+    instance_type: mac_mini_m2
+    environment:
+      android_signing:
+        - VUNO_UPLOAD_KEY
+      node: 22
+    scripts:
+      - name: Abhängigkeiten
+        script: cd native && npm install
+      - name: Android-Projekt erzeugen
+        script: cd native && (test -d android || npx cap add android) && npx cap sync android
+      - name: Bauen
+        script: cd native/android && ./gradlew bundleRelease
+    artifacts:
+      - native/android/app/build/outputs/bundle/release/*.aab
