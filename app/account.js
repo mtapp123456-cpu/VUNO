@@ -54,7 +54,18 @@ function showLogin() {
     <form id="f-start" class="stack"><label>${start ? 'E-Mail-Adresse' : 'Einladungscode oder E-Mail-Adresse'}<input name="login" autocomplete="email" autocapitalize="off" spellcheck="false" required></label>
       <button class="btn block" type="submit">Weiter</button></form>
     <div id="g-msg"></div>
+    ${!start && window.APP_CONFIG.testLogin ? '<div class="btnrow"><button class="btn ghost block" data-action="pw-login">🔑 Testzugang mit Passwort</button></div>' : ''}
     ${legalLinks()}`);
+}
+// Testphase: Anmeldung mit E-Mail und Passwort, falls die Code-Mail nicht ankommt. Abschalten in config.js (testLogin: false).
+function showPasswordLogin() {
+  gate(`<h2>Testzugang</h2>
+    <p class="muted">Anmeldung mit E-Mail-Adresse und Passwort. Das Passwort legt der Betreiber in Supabase fest.</p>
+    <form id="f-pw" class="stack"><label>E-Mail-Adresse<input name="email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" required></label>
+      <label>Passwort<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="btn block" type="submit">Anmelden</button></form>
+    <div id="g-msg"></div>
+    <div class="btnrow"><button class="btn ghost" data-action="back-login">Zurück</button></div>`);
 }
 function showOtp() {
   gate(`<h2>Code eingeben</h2>
@@ -219,6 +230,12 @@ async function accountSubmit(form) {
         await enterApp(); return;
       }
       case 'f-code': await showJoin(v('code')); return;
+      case 'f-pw': {
+        if (!window.APP_CONFIG.testLogin) return;
+        const {error} = await sb.auth.signInWithPassword({email: v('email'), password: form.elements.password.value});
+        if (error) { gateError('g-msg', (error.status === 429 || /rate/i.test(error.message || '')) ? otpError(error) : 'E-Mail-Adresse oder Passwort stimmt nicht.'); break; }
+        await enterApp(); return;
+      }
       case 'f-join': {
         const {data: {session}} = await sb.auth.getSession();
         if (!session) {
@@ -487,6 +504,7 @@ async function accountAction(a, el, e) {
     case 'settings': openSettings(); break;
     case 'restart': pendingCode = ''; await enterApp(); break;
     case 'back-login': showLogin(); break;
+    case 'pw-login': showPasswordLogin(); break;
     case 'resend': {
       const {error} = await sb.auth.signInWithOtp({email: otpEmail, options: {shouldCreateUser: true}});
       if (error) gateError('g-msg', otpError(error)); else toast('Code wurde neu gesendet');

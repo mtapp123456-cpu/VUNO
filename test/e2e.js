@@ -345,6 +345,48 @@ const ok = (n, c, i = '') => { res.push(!!c); console.log((c ? 'OK   ' : 'FAIL '
   await berta.click('[data-action=settings]'); await berta.waitForSelector('[data-action=delete-ask]');
   ok('Nur Admins sehen die Aussehen-Einstellung', (await berta.locator('#f-brand').count()) === 0);
   await berta.click('[data-action=close]');
+  // --- Teilnahme 👍 ❓ 👎 ---
+  await anna.evaluate(async d => { const k = TEAMS.find(t => t.name === 'Kendo');
+    await insertBookings([{title: 'Kendo-Training', team: k.id, facility: '', unit: '', date: d, start: '18:00', end: '19:30', note: ''}]); await loadAttendance(); }, dateIn(2));
+  await carl.goto(base + '#start'); await carl.reload(); await carl.waitForFunction(() => loadState === 'ok' && Object.keys(ATT).length > 0);
+  await carl.waitForSelector('.itemwrap .att [data-s=yes]');
+  await shot(carl, '17-teilnahme-liste');
+  ok('Spieler sieht 👍 ❓ 👎 beim eigenen Mannschaftstermin', (await carl.locator('.itemwrap .att [data-s=yes]').count()) >= 1);
+  ok('Keine Abstimm-Knöpfe bei fremden Mannschaften', (await carl.locator('.att [data-action=att]').count()) === (await carl.locator('.itemwrap').filter({hasText: 'Kendo-Training'}).locator('[data-action=att]').count()));
+  await carl.locator('.itemwrap').filter({hasText: 'Kendo-Training'}).first().locator('[data-s=yes]').click();
+  await carl.waitForFunction(() => Object.values(ATT).some(a => a.mine === 'yes' && a.yes === 1));
+  ok('Zusage wird gespeichert und gezählt', (await carl.locator('.itemwrap').filter({hasText: 'Kendo-Training'}).first().textContent()).includes('👍 1'));
+  await carl.locator('.itemwrap').filter({hasText: 'Kendo-Training'}).first().locator('[data-s=yes]').click();
+  await carl.waitForFunction(() => Object.values(ATT).every(a => a.mine !== 'yes'));
+  ok('Erneutes Antippen nimmt die Zusage zurück', true);
+  await carl.locator('.itemwrap').filter({hasText: 'Kendo-Training'}).first().locator('[data-s=maybe]').click();
+  await carl.waitForFunction(() => Object.values(ATT).some(a => a.mine === 'maybe'));
+  await carl.locator('.itemwrap').filter({hasText: 'Kendo-Training'}).first().locator('.item').click();
+  await carl.waitForSelector('#attbox .att-row');
+  await shot(carl, '18-teilnahme-detail');
+  ok('Terminansicht zeigt Namensliste', (await carl.textContent('#attbox')).includes('Carl') && (await carl.textContent('#attbox')).includes('Vielleicht'));
+  ok('Spieler kann andere nicht ändern', (await carl.locator('#attbox .att-mini').count()) === 0);
+  await carl.click('#attbox .att-mine [data-s=no]');
+  await carl.waitForFunction(() => Object.values(ATT).some(a => a.mine === 'no'));
+  await carl.waitForFunction(() => document.querySelector('#attbox') && document.querySelector('#attbox').textContent.includes('Abgesagt'));
+  ok('Absage aus der Terminansicht', true);
+  await carl.click('[data-action=close]');
+  ok('Teilnahme ohne Überlauf', await noOverflow(carl));
+
+  const kendoId = await anna.evaluate(() => TEAMS.find(t => t.name === 'Kendo').id);
+  await anna.evaluate(id => { location.hash = '#team-' + id; return loadAttendance(); }, kendoId);
+  await anna.waitForSelector('.attov-row');
+  await shot(anna, '19-trainer-uebersicht');
+  ok('Trainer-Übersicht zeigt Zähler', (await anna.textContent('.attov')).includes('👎 1'));
+  ok('Mannschaftsseite zeigt Spielerzahl', (await anna.textContent('.teamhead')).includes('1/50'));
+  await anna.click('.attov-row');
+  await anna.waitForSelector('#attbox .att-mini');
+  await anna.click('#attbox .att-mini [data-s=yes]');
+  await anna.waitForFunction(() => document.querySelector('#attbox') && document.querySelector('#attbox').textContent.includes('Zugesagt (1)'));
+  ok('Admin trägt für Spieler ein', true);
+  await anna.click('[data-action=close]');
+  await carl.goto(base + '#anlagen-platz');
+
   // --- Konto ---
   await carl.reload(); await carl.waitForSelector('.tl-track');
   await carl.click('[data-action=settings]'); await carl.waitForSelector('[data-action=delete-ask]');

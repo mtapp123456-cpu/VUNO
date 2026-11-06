@@ -4,5 +4,7 @@ window.APP_CONFIG = {
   supabaseUrl: 'https://sdnrmhjppvwiqudmugbm.supabase.co',
   supabaseKey: 'sb_publishable_6T31jc_qSnOOCUJHpbIFuA_5K9GLIph',
   imprintUrl: '',
-  privacyUrl: ''
+  privacyUrl: '',
+  // Testphase: zusätzlicher Knopf „Testzugang mit Passwort“. Vor dem Verkauf auf false stellen.
+  testLogin: true
 };

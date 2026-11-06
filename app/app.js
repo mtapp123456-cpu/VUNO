@@ -41,6 +41,10 @@ let extending = false;
 let channel = null;
 let hiddenAt = 0;
 
+let ATT = {};              // Teilnahme je Termin: {yes, maybe, no, open, mine}
+let attTimer = null;
+const inTeam = teamId => !!me && (me.team_ids || []).includes(teamId);
+const hasEnded = b => b.date < todayStr() || (b.date === todayStr() && b.end <= nowHM());
 const canBook = teamId => !!me && (me.role === 'admin' || (me.role === 'trainer' && (me.team_ids || []).includes(teamId)));
 const bookableTeams = () => TEAMS.filter(t => canBook(t.id));
 
@@ -73,7 +77,19 @@ async function reloadBookings() {
     loadState = 'ok';
   } catch (e) { loadState = 'error'; }
   refresh();
+  loadAttendance();
 }
+async function loadAttendance() {
+  if (!me) return;
+  const club = me.club_id;
+  const {data, error} = await sb.rpc('attendance_overview', {p_club: club, p_from: addDays(todayStr(), -14), p_to: addDays(todayStr(), 180)});
+  if (error || !me || me.club_id !== club) return;
+  ATT = {};
+  for (const r of data) ATT[r.booking_id] = r;
+  refresh();
+  if (formCtx.id && document.getElementById('attbox')) loadRoster(formCtx.id);
+}
+const scheduleAttendance = () => { clearTimeout(attTimer); attTimer = setTimeout(loadAttendance, 400); };
 // Ältere Termine werden erst geladen, wenn man dorthin blättert
 async function maybeExtendRange() {
   if (!me || extending || !lowDate) return;
@@ -108,6 +124,9 @@ function subscribeLive() {
       db.bookings = db.bookings.filter(x => x.id !== p.old.id);
       if (db.bookings.length !== n) refresh();
     })
+    .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'attendance', filter}, scheduleAttendance)
+    .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'attendance', filter}, scheduleAttendance)
+    .on('postgres_changes', {event: 'DELETE', schema: 'public', table: 'attendance'}, p => { if (p.old && ATT[p.old.booking_id]) scheduleAttendance(); })
     .subscribe(status => {
       if (status === 'SUBSCRIBED') { if (connectedBefore) reloadBookings(); connectedBefore = true; }
     });
@@ -187,7 +206,23 @@ let formCtx = {id: null};
 const app = document.getElementById('app');
 
 /* =================== Bausteine =================== */
+const ATT_LABEL = {yes: ['👍', 'Ich bin dabei'], maybe: ['❓', 'Vielleicht'], no: ['👎', 'Ich kann nicht']};
+const attCounts = a => `<span class="attcnt">👍 ${a.yes} · ❓ ${a.maybe} · 👎 ${a.no}${a.open ? ` · <span class="open">${a.open} offen</span>` : ''}</span>`;
+function attButtons(id, cur, user, big) {
+  return Object.keys(ATT_LABEL).map(s => `<button type="button" class="attbtn ${big ? 'big' : ''} ${cur === s ? 'on ' + s : ''}" data-action="att" data-id="${id}" data-s="${s}"${user ? ` data-u="${user}"` : ''}
+    aria-pressed="${cur === s}" title="${ATT_LABEL[s][1]}" aria-label="${ATT_LABEL[s][1]}">${ATT_LABEL[s][0]}${big ? `<small>${ATT_LABEL[s][1]}</small>` : ''}</button>`).join('');
+}
+function attRowHTML(b) {
+  const a = ATT[b.id];
+  if (!a) return '';
+  const vote = inTeam(b.team) && !hasEnded(b);
+  return `<div class="att">${vote ? attButtons(b.id, a.mine) : ''}${attCounts(a)}</div>`;
+}
 function itemHTML(b, showDate) {
+  const att = attRowHTML(b);
+  return att ? `<div class="itemwrap" style="--c:${team(b.team).color}">${itemBtnHTML(b, showDate)}${att}</div>` : itemBtnHTML(b, showDate);
+}
+function itemBtnHTML(b, showDate) {
   const t = team(b.team);
   const live = b.date === todayStr() && b.start <= nowHM() && nowHM() < b.end;
   return `<button class="item" data-action="edit" data-id="${b.id}" style="--c:${t.color}">
@@ -296,13 +331,27 @@ function viewTeam(id) {
     <h2>${x.icon} ${esc(x.name)}</h2><p>${esc(x.sport)}</p>
     <div class="stats">
       <div class="stat"><b>${trainings}</b><span>Trainings (7 Tage)</span></div>
+      <div class="stat"><b>${x.players || 0}/50</b><span>Spieler</span></div>
       <div class="stat"><b>${ng ? fmtShort(ng.date) : '–'}</b><span>${ng ? esc(ng.title) + ' ' + ng.start : 'kein Spiel geplant'}</span></div>
     </div>
     <div class="btnrow"><button class="btn light" data-action="new" data-team="${x.id}">+ Termin eintragen</button>
       <a class="btn light" href="#kalender" data-action="calteam" data-team="${x.id}">📅 Im Kalender</a></div>
   </section>
+  ${canBook(id) ? attOverviewHTML(list) : ''}
   <h3>Termine der nächsten 30 Tage</h3>
   ${groupedHTML(list, 'Keine Termine in den nächsten 30 Tagen.')}`;
+}
+// Trainer-Übersicht: Zu- und Absagen der nächsten Termine auf einen Blick
+function attOverviewHTML(list) {
+  const rows = list.filter(b => ATT[b.id]).slice(0, 8);
+  if (!rows.length) return '';
+  return `<h3>👥 Teilnahme-Übersicht</h3><div class="card attov">${rows.map(b => {
+    const a = ATT[b.id], total = a.yes + a.maybe + a.no + a.open;
+    return `<button class="attov-row" data-action="edit" data-id="${b.id}">
+      <span class="attov-main"><b>${fmtShort(b.date)} ${b.start}</b> ${esc(b.title)}</span>${attCounts(a)}
+      <span class="attbar"><i class="yes" style="width:${a.yes / total * 100}%"></i><i class="maybe" style="width:${a.maybe / total * 100}%"></i><i class="no" style="width:${a.no / total * 100}%"></i></span>
+    </button>`;
+  }).join('')}<p class="muted" style="font-size:13px;margin:6px 0 0">Antippen zeigt, wer zu- oder abgesagt hat.</p></div>`;
 }
 
 function viewAnlagen(group) {
@@ -425,6 +474,7 @@ function openForm(b) {
   formCtx = {id: isNew ? null : b.id, seriesId: b.seriesId || null};
   openSheet(`<form id="bform" novalidate>
     <div class="sheet-head"><h3>${isNew ? 'Neue Buchung' : 'Buchung bearbeiten'}</h3><button type="button" class="x" data-action="close" aria-label="Schließen">✕</button></div>
+    ${!isNew && ATT[b.id] ? '<div id="attbox" class="attbox"><p class="muted" style="margin:0">Teilnahme wird geladen …</p></div>' : ''}
     <label>Titel<input name="title" value="${esc(d.title)}" placeholder="z. B. Training, Heimspiel, Feier" maxlength="60" autocomplete="off"></label>
     <label>Mannschaft / Gruppe<select name="team">${(viewOnly ? TEAMS : bookableTeams()).map(t => `<option value="${t.id}" ${t.id === d.team ? 'selected' : ''}>${t.icon} ${esc(t.name)}</option>`).join('')}</select></label>
     <div class="row2">
@@ -447,14 +497,51 @@ function openForm(b) {
       <button type="submit" class="btn">Speichern</button>
     </div>
   </form>`);
+  if (!isNew && ATT[b.id]) loadRoster(b.id);
   if (viewOnly) {
-    sheet.querySelector('h3').textContent = 'Buchung';
-    for (const x of document.getElementById('bform').elements) if (x.dataset.action !== 'close') x.disabled = true;
+    sheet.querySelector('h3').textContent = 'Termin';
+    for (const x of document.getElementById('bform').elements) if (x.dataset.action !== 'close' && x.dataset.action !== 'att') x.disabled = true;
     document.getElementById('factions').innerHTML = '<p class="muted" style="margin:0;font-size:13px">Nur Ansicht – ändern kann das nur die zuständige Person oder der Vorstand.</p>';
     return;
   }
   liveCheck();
   if (isNew) setTimeout(() => { const i = sheet.querySelector('[name=title]'); if (i && window.matchMedia('(pointer:fine)').matches) i.focus(); }, 50);
+}
+async function loadRoster(id) {
+  const {data, error} = await sb.rpc('booking_attendance', {p_booking: id});
+  const box = document.getElementById('attbox');
+  if (!box || formCtx.id !== id) return;
+  if (error) { box.innerHTML = '<p class="muted" style="margin:0">Die Teilnahme konnte nicht geladen werden.</p>'; return; }
+  const b = db.bookings.find(x => x.id === id), a = ATT[id];
+  if (!b || !data.length) { box.remove(); return; }
+  const mgr = canBook(b.team), ended = hasEnded(b);
+  const groups = [['yes', '👍 Zugesagt'], ['maybe', '❓ Vielleicht'], ['no', '👎 Abgesagt'], [null, 'Noch keine Antwort']];
+  let h = `<div class="att-head"><b>Teilnahme</b>${a ? attCounts(a) : ''}</div>`;
+  if (inTeam(b.team) && !ended) h += `<div class="att-mine">${attButtons(id, a && a.mine, null, true)}</div>`;
+  else if (ended) h += '<p class="muted" style="font-size:13px;margin:4px 0">Termin ist vorbei.</p>';
+  for (const [s, label] of groups) {
+    const people = data.filter(r => (r.status || null) === s);
+    if (!people.length) continue;
+    h += `<div class="att-group"><div class="att-gl">${label} (${people.length})</div>${people.map(r => `<div class="att-row">
+      <span>${esc(r.display_name)}${r.club_role === 'trainer' ? ' <span class="badge">Trainer</span>' : ''}</span>
+      ${mgr ? `<span class="att-mini">${attButtons(id, r.status, r.user_id)}</span>` : ''}</div>`).join('')}</div>`;
+  }
+  box.innerHTML = h;
+}
+let attBusy = false;
+async function setAttendance(id, s, user) {
+  if (attBusy) return;
+  const a = ATT[id];
+  const own = !user;
+  const val = own && a && a.mine === s ? null : s; // erneutes Antippen nimmt die eigene Antwort zurück
+  if (own && a) { if (a.mine) a[a.mine]--; else a.open--; if (val) a[val]++; else a.open++; a.mine = val; refresh(); }
+  attBusy = true;
+  const {error} = await sb.rpc('set_attendance', {p_booking: id, p_status: val, p_user: user || null});
+  attBusy = false;
+  if (error) toast(friendlyError(error));
+  else if (own) toast(val ? {yes: 'Zugesagt 👍', maybe: 'Vielleicht ❓', no: 'Abgesagt 👎'}[val] : 'Antwort zurückgenommen');
+  else toast('Gespeichert');
+  await loadAttendance();
 }
 function readForm() {
   const f = document.getElementById('bform'), el = f.elements;
@@ -518,6 +605,7 @@ async function submitForm() {
   }
   saving = false;
   toast(formCtx.id ? 'Gespeichert' : list.length > 1 ? `${list.length} Termine eingetragen` : 'Gebucht');
+  loadAttendance();
   sel.date = d.date; sel.month = d.date.slice(0, 7);
   closeSheet();
   route();
@@ -578,6 +666,7 @@ document.addEventListener('click', e => {
       openForm({date: el.dataset.date, facility: f.id, unit: u.id, start: fromMin(s), end: fromMin(end)});
       break;
     }
+    case 'att': e.preventDefault(); setAttendance(el.dataset.id, el.dataset.s, el.dataset.u); break;
     case 'close': closeSheet(); break;
     case 'day': sel.date = addDays(sel.date, Number(el.dataset.d)); sel.month = sel.date.slice(0, 7); route(); break;
     case 'today': sel.date = todayStr(); sel.month = sel.date.slice(0, 7); route(); break;
