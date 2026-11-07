@@ -6,5 +6,5 @@ window.APP_CONFIG = {
   imprintUrl: '',
   privacyUrl: '',
   // Testphase: zusätzlicher Knopf „Testzugang mit Passwort“. Vor dem Verkauf auf false stellen.
-  testLogin: true
+  testLogin: false
 };
