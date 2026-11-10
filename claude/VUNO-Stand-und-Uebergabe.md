@@ -217,3 +217,24 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 - Die Erkennung von „Mitglieder & Fans“ läuft über den Teamnamen (App und Datenbank, Muster `mitglieder … & / und … fans`). Wird die Gruppe umbenannt, greifen die Regeln nicht mehr. Besser wäre später ein eigenes Feld am Team.
 - Im offenen Testzugang ist jeder Admin. Die Sperre für Mitglieder & Fans sieht man dort nur über die Fan-Vorschau.
 - Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+## 10.11.2026 – VUNO-Logo in der Kopfzeile und anklickbare Startfeld-Kacheln, Nachtrag (Claude, Chat vom 07.11., ca. 22:46–23:00)
+
+**Letzter Stand:** Kein Commit im GitHub-Projekt. Am 07.11. gegen 23:00 direkt bei Cloudflare als neue Produktions-Bereitstellung von `vuno-app` hochgeladen (über „Bereitstellung erstellen“, Vorgänger war `1544133b`). Die neue Bereitstellungs-ID wurde nicht notiert; nach der Reihenfolge im Eintrag „Erster Zurück-Knopf“ ist es sehr wahrscheinlich `71ff75c2`. Service-Worker-Cache `vereins-app-v18` (vorher v17).
+- Das ist der Upload zum Eintrag direkt darüber („Links im roten Startfeld“, Chat 20:24–22:01): Diese Sitzung hat dessen Dateien aus `Desktop\VUNO-Logo-Update` übernommen und live gestellt. Einziger Unterschied: `vuno-logo-kopf.png` hier auf 300 × 72 px verkleinert, `width`/`height` in `index.html` entsprechend 300/72.
+- ZIP als Datei: `Downloads\vuno-upload-6.zip` auf dem PC des Nutzers (14 Dateien). Inhalt identisch mit dem, was hochgeladen wurde (per SHA-256 geprüft).
+- Grundlage war die damalige Live-Fassung v17 von vuno-app.pages.dev, nicht der Ordner `Downloads\Sportverein-App--master` (alte Fassung ohne Supabase) und nicht `vuno-upload-5.zip` (v14, älter als live).
+- In `Downloads` liegt dazu noch `526061ce-930e-49c4-8707-4f9c3679d218.tmp`: eine JSON-Momentaufnahme der Live-Dateien v17 aus dieser Sitzung. Kann gelöscht werden.
+
+**Was geändert wurde**
+- Kopfzeile: VUNO-Logo mit „One Team, One App“ rechts neben dem Vereinsnamen, vor dem ⚙️-Knopf (`index.html`: `<img class="vuno-head" src="vuno-logo-kopf.png">`, Stil in `modern.css`, 34 px hoch, unter 360 px Breite 28 px). `vuno-logo-kopf.png` war in dieser Fassung auf 300 × 72 px verkleinert (ca. 6 KB). Es wurde später durch die scharfe Fassung ersetzt (siehe Eintrag „Sportheim, Glas-Design …“).
+- Seitentitel „VUNO – One team. One app.“, Name auf dem Homescreen „VUNO“ (`index.html`).
+- Neue Datei `vuno-start.js` (lädt nach `account.js`, ändert `app.js` nicht): Die drei Kacheln im roten Startfeld sind Links. „Termine heute“ → Vereinskalender in der Tagesansicht von heute, „gerade belegt“ → Sportplatzbelegung, „nächste 7 Tage“ wurde zu „anstehende Spiele“ → neue Seite `#spiele` mit allen kommenden Terminen, die „Spiel“ im Titel haben.
+- `sw.js`: Cache v17 → v18, `vuno-logo-kopf.png` und `vuno-start.js` in der Dateiliste.
+- Alle anderen Dateien unverändert aus der Live-Fassung v17. Vorher geprüft: Die übrigen Wünsche (Plus-Knopf bis 50, Begründung bei ❓/👎, Abstimmung in allen Mannschaften, Breaking News 48 h, Sportplatzbelegung mit zwei Reitern, Mitglieder & Fans mit 500 Plätzen und Fahrergruppen, Reiter A-Jugend bis Bambini, „App teilen“) waren in v17 schon live.
+- Nach dem Hochladen in der Live-App in Handygröße geprüft: Logo in der Kopfzeile, drei Kacheln anklickbar.
+
+**Was offen ist**
+- Dieser Stand ist überholt (v19 und später, siehe Einträge oben). Hier nur zur Nachvollziehbarkeit.
+- Wie bei den anderen Einträgen: `vuno-start.js` und die übrigen Live-Dateien sind nicht in GitHub `main`.
+- „Anstehende Spiele“ erkennt Spiele nur am Wort „Spiel“ im Termintitel (Heimspiel, Auswärtsspiel, Punktspiel …). Termine ohne dieses Wort fehlen in der Liste.
+- Hinweis zum Hochladen: Das ZIP wurde im Dashboard per Skript gebaut und in das Datei-Feld „Datei auswählen“ gelegt (DataTransfer); die Live-Dateien ließen sich aus dem Dashboard heraus von vuno-app.pages.dev laden. Der Klick auf „Speichern und bereitstellen“ erfolgte erst nach ausdrücklicher Freigabe des Nutzers.
