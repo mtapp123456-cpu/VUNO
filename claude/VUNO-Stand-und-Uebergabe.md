@@ -159,3 +159,27 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Im Schlussbild fehlt eine Web-Adresse oder ein Kontakt für „Jetzt Testverein werden“. Die Testseite ist ohne Anmeldung offen (siehe `openAccess`), deshalb Adresse erst einsetzen, wenn das gewollt ist.
 - Optional: echte Bildschirmaufnahmen der App am Handy aufnehmen und schicken, dann ersetzt Claude die nachgebauten Beispiel-Ansichten; echtes Logo `app/logo.png` einbauen; Querformat-Version für YouTube/Webseite.
 - Unverändert offen: Live-Fassung nach GitHub übernehmen, Prüfung auf einem echten Handy, vor Live-Gang `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+
+## 10.11.2026 – VUNO-Logo in der Kopfzeile und Links im roten Startfeld (Claude, Chat vom 07.11., 20:24–22:01)
+
+**Letzter Stand:** Kein ZIP und kein Commit im GitHub-Projekt. Diese Sitzung durfte **nicht** bei Cloudflare hochladen (Veröffentlichen in die Live-App war für sie gesperrt). Die Ergebnisse liegen nur als Einzeldateien auf dem PC des Nutzers:
+- **Endfassung dieser Sitzung:** `Desktop\VUNO-Logo-Update` (oberste Ebene): `index.html`, `modern.css`, `sw.js` (Cache `vereins-app-v18`), `vuno-logo-kopf.png`, `vuno-start.js`, dazu `vuno-logo-gross.png` (nur für Flyer usw., nicht für die App). Grundlage war die Live-Fassung vom 07.11. abends (Cache v17), die Dateien wurden per Prüfsumme damit abgeglichen.
+- **Zwischenstand, überholt:** `Downloads\Sportverein-App--master\VUNO-Design-Update` (u. a. `vuno-logo.svg` und `vuno-logo.png`, die die App nicht mehr nutzt; kann gelöscht werden).
+- Laut den späteren Einträgen oben sind `vuno-logo-kopf.png` und `vuno-start.js` inzwischen in der Live-Fassung angekommen (hochgeladen vom Nutzer oder einer anderen Sitzung). Das Kopf-Logo wurde später durch die scharfe Fassung aus `Logo-scharf` ersetzt.
+
+**Was geändert wurde**
+- **Logo:** Im vom Nutzer geschickten VUNO-Logo wurde der Slogan „TEAM & ORGA“ durch „ONE TEAM, ONE APP“ ersetzt (gleiche Blau-Türkis-Farbe, Seitenlinien, Bildschirm-Knopf aus dem Screenshot entfernt) → `vuno-logo-gross.png`.
+- **Kopfzeile:** Querformat-Fassung (V links, „VUNO“ und Slogan rechts, durchsichtiger Hintergrund) als `vuno-logo-kopf.png`, rechts neben dem ⚙️-Knopf, Höhe 34 px (28 px bei sehr schmalen Bildschirmen). Vereinswappen und Vereinsname bleiben links und werden bei langen Namen mit „…“ gekürzt (`modern.css`, `index.html`). Ein erster Versuch mit Logo am Seitenende wurde wieder entfernt.
+- **Rotes Startfeld, neue Datei `vuno-start.js`** (in `index.html` nach `account.js` eingebunden, ändert `app.js` nicht, sondern umhüllt `viewStart()` und `route()`):
+  - „Termine heute“ → Vereinskalender in der Tagesansicht von heute.
+  - „gerade belegt“ → Sportplatzbelegung von heute (Reiter Sportplätze, sonst Sporthallen).
+  - Dritte Kachel statt „nächste 7 Tage“ jetzt **„anstehende Spiele“** mit Anzahl → neue Seite `#spiele` mit allen kommenden Spielen aller Abteilungen, nach Datum gruppiert.
+  - Als Spiel zählt ein Termin, wenn „Spiel“ im Titel steht (Heimspiel, Auswärtsspiel, Punktspiel …), wie schon bei „nächstes Spiel“ auf der Mannschaftsseite.
+- `sw.js`: Cache auf `vereins-app-v18`, `vuno-logo-kopf.png` und `vuno-start.js` in die Dateiliste aufgenommen. `<title>` „VUNO – One team. One app.“, iPhone-Name „VUNO“.
+- Geprüft nur als Vorschau im eingebauten Browser auf dem PC (in die Live-Seite eingeblendet, nicht gespeichert): alle drei Kacheln führen an die richtige Stelle. Die Spiele-Liste wurde mit zwei eingeblendeten Beispiel-Spielen getestet, gespeichert wurde nichts.
+
+**Was offen ist**
+- Spiele werden nur über das Wort „Spiel“ im Titel erkannt. Ein eigenes Feld „Art: Spiel/Training“ gibt es nicht. Termine ohne dieses Wort fehlen in der Liste.
+- Nicht auf einem echten Handy geprüft.
+- Weiterhin: Live-Fassung nach GitHub übernehmen (siehe Einträge oben). `vuno-start.js` ist nicht im Repo.
+- Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
