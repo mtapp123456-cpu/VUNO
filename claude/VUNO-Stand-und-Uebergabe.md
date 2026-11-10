@@ -76,3 +76,17 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Die Foto-Kacheln greifen nur bei genau diesen Kachelnamen. Neue oder umbenannte Abteilungen bekommen noch kein Foto.
 - Nur im Browser in Handygröße geprüft, noch nicht auf einem echten Handy.
 - Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+
+## 10.11.2026 – Rückfrage zu Ändern und Zurücksetzen (Claude, Chat vom 10.11.)
+
+**Letzter Stand:** In dieser Sitzung ist **keine neue Version und kein neues ZIP** entstanden, und an der App wurde **nichts geändert**. Die Live-Fassung bleibt `vuno-app.pages.dev` (Cloudflare, Direkt-Upload, Service-Worker-Cache `vereins-app-v24`, Stand 08.11.). GitHub `main` ist unverändert bis auf diesen Eintrag.
+
+**Was besprochen wurde**
+- Frage: Kann die App jetzt nach Wunsch verändert und später zurückgesetzt werden? Antwort: Ja. Beim Code geht das über den GitHub-Verlauf (am besten in einem eigenen Zweig statt direkt in `main`) und bei Cloudflare Pages über frühere Bereitstellungen, auf die man mit einem Klick zurückspringen kann.
+- Wichtiger Vorbehalt: Die Supabase-Datenbank wird dadurch **nicht** mitzurückgesetzt. Bei Änderungen mit Migration (neue Tabellen oder Felder) vorher den Stand sichern oder auf einer Kopie testen.
+- Wichtiger Vorbehalt zur Live-Fassung: Weil die Live-Seite neuer ist als GitHub `main` (siehe Eintrag vom 07./08.11.), ist ein Zurücksetzen über GitHub heute nur sicher, wenn die Live-Dateien vorher ins Repo übernommen oder lokal gesichert sind. Bei Cloudflare bleiben die früheren Bereitstellungen (z. B. `00e8eb2d`, `2c86b07d`) als Rücksprungpunkt erhalten.
+
+**Was offen ist**
+- Live-Fassung von vuno-app.pages.dev (alle Dateien laut Liste im Eintrag vom 07./08.11.) ins Repo übernehmen und als Rücksprungpunkt markieren (Tag oder Zweig), bevor weiter verändert wird.
+- Vor größeren Änderungen einen Zweig anlegen (ca. 1 Minute); Zurücksetzen im Code dauert ca. 2–5 Minuten.
+- Weiterhin offen und unverändert: `migration_6.sql` und Banner-Dateien ins Repo, Prüfung auf einem echten Handy, vor Live-Gang `openAccess` auf `false` und in Supabase `update public.clubs set open_access = false;`.
