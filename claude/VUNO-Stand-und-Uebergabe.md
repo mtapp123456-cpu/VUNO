@@ -20,3 +20,19 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - **Der GitHub-Stand ist älter als die Wunschliste.** In `main` fehlen laut Suche im Code u. a.: `openAccess` in `config.js` und `supabase/migration_5.sql` (Testverein offen ohne Anmeldung), Sportplatzbelegung mit zwei Reitern, Breaking-News-Banner, „App teilen“, Fahrergruppen für „Mitglieder & Fans“, Fußball-Reiter bis Bambini, Sportheim mit Speisekarte und Aktion, Begründung bei ❓/👎 und das Design „Dunkel & Leuchten“. Entweder liegen diese Teile in einer anderen Fassung oder ZIP außerhalb von GitHub oder sie sind noch nicht umgesetzt. Das muss geklärt werden, bevor weiter gebaut wird.
 - Vor Live-Gang oder Übergabe an einen Verein: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;` ausführen.
 - Die Datei `claude/VUNO-Stand-und-Uebergabe.md` gab es im GitHub-Projekt noch nicht und wurde mit diesem Eintrag neu angelegt. Falls es sie an anderer Stelle schon gibt, den Eintrag dort einfügen.
+
+## 10.11.2026 – Breaking-News-Banner, Nachtrag (Claude, Chat vom 07.11.)
+
+**Letzter Stand:** Kein neues ZIP und keine neue Version im GitHub-Projekt. Am 07.11. hatte diese Sitzung keinen Zugriff auf GitHub, deshalb wurde nichts committet. Der Banner liegt nur als drei Einzeldateien vor, die dem Nutzer im Chat geschickt wurden: `migration_6.sql`, `news-banner.js`, `news-banner.css`. Dazu gibt es das Dokument „VUNO – Breaking-News-Banner“ (claude.ai-Artefakt) mit derselben Anleitung.
+
+**Was gebaut wurde (noch nicht in `main`)**
+- Breaking-News-Laufband auf der Startseite mit Meldungen aus allen Mannschaften. Posten dürfen nur Trainer und Admins, jede Meldung ist 48 Stunden sichtbar.
+- `migration_6.sql`: Tabelle `public.breaking_news` (club_id, team_id, text max. 200 Zeichen, author_id, created_at), RLS-Regeln (Lesen nur der letzten 48 h, Anlegen und Löschen nur für `trainer`/`admin`), Realtime aktiviert.
+- `news-banner.js`: legt Banner und Eingabefeld selbst an, Aufruf `VunoNews.init({ supabase, clubId, teamId, role })`, Live-Aktualisierung und alle 10 Minuten Neuladen.
+- `news-banner.css`: rotes Laufband, Pause bei Berührung, ruhige Anzeige bei „Bewegung reduzieren“.
+
+**Was offen ist**
+- Dateien ins Repo übernehmen und den Aufruf in `app/index.html` bzw. `app/app.js` einbauen, danach `app/sw.js` (Cache) hochsetzen.
+- Die Tabellennamen passen zu `supabase/schema.sql` (`members`, `user_id`, `club_id`, `role`). Die Regeln prüfen aber noch nicht `status = 'active'`, das sollte ergänzt werden. Prüfen, ob es `migration_5.sql` schon außerhalb von GitHub gibt, damit die Nummer 6 stimmt.
+- Im offenen Testzugang ohne Anmeldung gibt es kein `auth.uid()`, dann kann niemand posten. Für den Test Meldungen direkt in Supabase eintragen.
+- Wunsch aus dem Sprachanruf: Die Abstimmung 👍/👎/❓ soll in jeder Abteilung und jeder Mannschaft funktionieren, nicht nur in der ersten Mannschaft. Noch nicht umgesetzt.
