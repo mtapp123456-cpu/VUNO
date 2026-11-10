@@ -90,6 +90,7 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Live-Fassung von vuno-app.pages.dev (alle Dateien laut Liste im Eintrag vom 07./08.11.) ins Repo übernehmen und als Rücksprungpunkt markieren (Tag oder Zweig), bevor weiter verändert wird.
 - Vor größeren Änderungen einen Zweig anlegen (ca. 1 Minute); Zurücksetzen im Code dauert ca. 2–5 Minuten.
 - Weiterhin offen und unverändert: `migration_6.sql` und Banner-Dateien ins Repo, Prüfung auf einem echten Handy, vor Live-Gang `openAccess` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+
 ## 10.11.2026 – Sportheim, Glas-Design, Flackern, Präsentationen (Claude, Chat vom 08.–10.11.)
 
 **Letzter Stand:** Live auf **vuno-app.pages.dev** (Cloudflare Pages, Projekt `vuno-app`, Direkt-Upload über das Dashboard, kein GitHub). Service-Worker-Cache jetzt **`vereins-app-v33`** (vorher v24). Auch diese Stände sind **nicht in GitHub `main`**.
