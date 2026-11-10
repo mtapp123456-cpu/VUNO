@@ -52,3 +52,27 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Die Live-Fassung bei Cloudflare (`vuno-app`, Direkt-Upload) ist deutlich neuer als `main` auf GitHub: Sie enthält z. B. das Breaking-News-Banner in `app.js` (Tabelle `news`, RPCs `post_news`/`delete_news`), `account.js`, `vuno-start.js` und `vuno-zurueck.js`. Diese Dateien sind nicht im Repo. Vor dem Weiterbauen die Live-Dateien ins Repo übernehmen, sonst geht beim nächsten Upload aus GitHub etwas verloren.
 - Nur im Browser auf dem PC geprüft, noch nicht auf einem echten Handy.
 - Auf dem Rechner gibt es danach noch den Ordner `Zurueck-Pfeil-fein-Update` (07.11., 23:36). Prüfen, ob dieser später hochgeladen wurde und die hier beschriebene Fassung ersetzt.
+
+## 10.11.2026 – Zurück-Pfeil, Banner auf jeder Seite, Foto-Kacheln (Claude, Chat vom 07./08.11.)
+
+**Letzter Stand:** Live auf **vuno-app.pages.dev** (Cloudflare Pages, Projekt `vuno-app`, Direkt-Upload, kein GitHub). Letzte Bereitstellung am 08.11. gegen 00:15 Uhr, Service-Worker-Cache `vereins-app-v24`. **Nichts davon ist in GitHub `main`.**
+- Letztes ZIP als Datei: `Downloads\vuno-upload-7.zip` auf dem PC des Nutzers (Stand v21: Zurück-Pfeil + Banner auf jeder Seite, noch ohne Foto-Kacheln).
+- Die drei späteren Bereitstellungen (Namen intern `vuno-upload-8/9/10.zip`, v22–v24) wurden direkt im Browser aus der Live-Fassung gebaut und hochgeladen. Als Datei gibt es sie nicht. **Die vollständige aktuelle Fassung ist nur die Live-Seite** – zum Sichern alle Dateien von vuno-app.pages.dev herunterladen (Liste unten).
+- Zur offenen Frage im Eintrag davor: Der Ordner `Desktop\VUNO-Logo-Update\Zurueck-Pfeil-fein-Update` ist ein Zwischenstand dieser Sitzung. Sein Inhalt steckt in `vuno-upload-7.zip` (v21) und wurde hochgeladen. Er ersetzt die Fassung `00e8eb2d` und ist inzwischen selbst durch v22–v24 überholt.
+- Grundlage war die Live-Fassung vom 07.11. (Cloudflare-Bereitstellung `00e8eb2d`). Sie ist neuer als `Desktop\VUNO-Logo-Update\Breaking-News-Zurueck-Update` und neuer als GitHub (enthält z. B. Kachel „anstehende Spiele“ in `vuno-start.js`, Breaking News, Fahrergruppen, `openAccess`).
+
+**Was geändert wurde**
+- Zurück-Pfeil (`vuno-zurueck.js`, `modern.css`): kleiner und feiner (30 px statt 40 px, dünnere Linie, weißer Knopf mit Pfeil in Vereinsfarbe). Er schwebt nicht mehr, sondern steht in einer eigenen Zeile direkt unter der Kopfzeile und überdeckt keine Logos oder Banner mehr. Sichtbar auf jeder Seite außer der Startseite. Nur im Breaking-News-Fenster schwebt er weiter darüber.
+- Neue Datei `vuno-seiten.js` (in `index.html` nach `vuno-start.js` eingebunden): Breaking-News-Laufband und rotes Vereinsbanner (Vereinsname, Datum, drei Kacheln) stehen jetzt oben auf **jeder** Seite, nicht nur auf der Startseite.
+- Startseiten-Kacheln als Bild-Buttons: Fußball, Basketball, Kendo, Turnen, Verein & Kalender, Mitglieder & Fans, Sportplatzbelegung, Sportheim zeigen ein KI-Foto mit dunklem Verlauf und weißer Schrift (`vuno-seiten.js`, `modern.css`, Klasse `tile-photo`). Bilder in `img/fussball.jpg`, `basketball.jpg`, `kendo.jpg`, `turnen.jpg`, `verein.jpg`, `fans.jpg`, `platz.jpg`, `heim.jpg` (640×400, je ca. 30–50 KB). Die Zuordnung läuft über den Kachelnamen.
+- Die Fotos wurden mit Workers AI im Cloudflare-Konto des Nutzers erzeugt (Modell `flux-1-schnell`). Fußball, Basketball, Turnen, Verein und Fans wurden auf Wunsch **neutral** neu erzeugt, also ohne Vereinsfarben, damit sie zu jeder Vereinsfarbe passen.
+- Dateien der Live-Fassung: `index.html`, `style.css`, `modern.css`, `app.js`, `account.js`, `config.js`, `manifest.webmanifest`, `sw.js`, `vendor/qrcode.js`, `vuno-logo-kopf.png`, `icon-180/192/512.png`, `vuno-start.js`, `vuno-zurueck.js`, `vuno-seiten.js`, `img/*.jpg` (8 Bilder).
+
+**Was offen ist**
+- **Live-Fassung nach GitHub übernehmen.** GitHub `main` und die Live-Seite laufen auseinander. Vor weiteren Änderungen klären, welche Fassung die führende ist, sonst gehen Teile verloren.
+- „Werbung“ wurde als Breaking-News-Laufband verstanden, weil es keine Werbefläche gibt. Falls echte Werbe- oder Sponsorenbanner gemeint sind, ist das noch nicht umgesetzt.
+- Vereinsfarben lassen sich schon in den Einstellungen ändern (Hauptfarbe, Kopfzeile, Logo, `update_club_branding`). Angeboten, aber noch nicht umgesetzt: Jeder Verein lädt eigene Fotos für die Kacheln hoch.
+- Kachel „Verein & Kalender“: Auf dem KI-Foto steht am Wandkalender unleserlicher Fantasietext. Bei Bedarf neu erzeugen.
+- Die Foto-Kacheln greifen nur bei genau diesen Kachelnamen. Neue oder umbenannte Abteilungen bekommen noch kein Foto.
+- Nur im Browser in Handygröße geprüft, noch nicht auf einem echten Handy.
+- Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
