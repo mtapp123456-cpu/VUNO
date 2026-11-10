@@ -36,3 +36,19 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Die Tabellennamen passen zu `supabase/schema.sql` (`members`, `user_id`, `club_id`, `role`). Die Regeln prüfen aber noch nicht `status = 'active'`, das sollte ergänzt werden. Prüfen, ob es `migration_5.sql` schon außerhalb von GitHub gibt, damit die Nummer 6 stimmt.
 - Im offenen Testzugang ohne Anmeldung gibt es kein `auth.uid()`, dann kann niemand posten. Für den Test Meldungen direkt in Supabase eintragen.
 - Wunsch aus dem Sprachanruf: Die Abstimmung 👍/👎/❓ soll in jeder Abteilung und jeder Mannschaft funktionieren, nicht nur in der ersten Mannschaft. Noch nicht umgesetzt.
+
+## 10.11.2026 – Zurück-Pfeil auf der Breaking-News-Seite, Nachtrag (Claude, Chat vom 07.11.)
+
+**Letzter Stand:** Kein ZIP und kein Commit im GitHub-Projekt. Die Änderung wurde am 07.11. um ca. 23:30 direkt bei Cloudflare als neue Bereitstellung des Projekts `vuno-app` hochgeladen (Deployment `00e8eb2d`, https://00e8eb2d.vuno-app.pages.dev, davor `2c86b07d`). Die drei geänderten Dateien liegen zusätzlich auf dem Rechner des Nutzers in `Desktop\VUNO-Logo-Update\Breaking-News-Zurueck-Update` (`vuno-zurueck.js`, `modern.css`, `sw.js`; die `index.html` dort ist eine ältere Fassung und gehört nicht dazu).
+
+**Was geändert wurde**
+- Zurück-Knopf (`vuno-zurueck.js`): nur noch ein kleiner runder Knopf mit Pfeil ‹, ohne das Wort „Zurück“.
+- Der Knopf erscheint jetzt auch, wenn das Breaking-News-Fenster offen ist (erkannt an `#newsbox` im Fenster). Ein Tipp schließt das Fenster (`closeSheet()` aus `app.js`) und führt zur Startseite. Auf der Startseite selbst bleibt der Knopf ausgeblendet.
+- `modern.css`: Knopf 40 × 40 px rund, über dem News-Fenster mit `z-index:60` (Klasse `over-sheet`), Abstand oben für `body.has-back` auf 50 px.
+- `sw.js`: Cache von `vereins-app-v19` auf `vereins-app-v20`.
+- Alle anderen Dateien der Bereitstellung wurden unverändert aus `2c86b07d` übernommen. Danach in der Live-App geprüft: Pfeil öffnet nicht auf der Startseite, erscheint in Breaking News, Tipp führt zu `#start`.
+
+**Was offen ist**
+- Die Live-Fassung bei Cloudflare (`vuno-app`, Direkt-Upload) ist deutlich neuer als `main` auf GitHub: Sie enthält z. B. das Breaking-News-Banner in `app.js` (Tabelle `news`, RPCs `post_news`/`delete_news`), `account.js`, `vuno-start.js` und `vuno-zurueck.js`. Diese Dateien sind nicht im Repo. Vor dem Weiterbauen die Live-Dateien ins Repo übernehmen, sonst geht beim nächsten Upload aus GitHub etwas verloren.
+- Nur im Browser auf dem PC geprüft, noch nicht auf einem echten Handy.
+- Auf dem Rechner gibt es danach noch den Ordner `Zurueck-Pfeil-fein-Update` (07.11., 23:36). Prüfen, ob dieser später hochgeladen wurde und die hier beschriebene Fassung ersetzt.
