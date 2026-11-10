@@ -90,3 +90,29 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Live-Fassung von vuno-app.pages.dev (alle Dateien laut Liste im Eintrag vom 07./08.11.) ins Repo übernehmen und als Rücksprungpunkt markieren (Tag oder Zweig), bevor weiter verändert wird.
 - Vor größeren Änderungen einen Zweig anlegen (ca. 1 Minute); Zurücksetzen im Code dauert ca. 2–5 Minuten.
 - Weiterhin offen und unverändert: `migration_6.sql` und Banner-Dateien ins Repo, Prüfung auf einem echten Handy, vor Live-Gang `openAccess` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+## 10.11.2026 – Sportheim, Glas-Design, Flackern, Präsentationen (Claude, Chat vom 08.–10.11.)
+
+**Letzter Stand:** Live auf **vuno-app.pages.dev** (Cloudflare Pages, Projekt `vuno-app`, Direkt-Upload über das Dashboard, kein GitHub). Service-Worker-Cache jetzt **`vereins-app-v33`** (vorher v24). Auch diese Stände sind **nicht in GitHub `main`**.
+- Die ZIPs (v25–v33) wurden jeweils im Browser aus den Live-Dateien gebaut und direkt hochgeladen. Als Datei gibt es kein ZIP davon. **Die vollständige aktuelle Fassung ist wieder nur die Live-Seite.**
+- Als Dateien auf dem PC liegen nur Zwischenstände: `Desktop\VUNO-Logo-Update\Sportheim-Update` (`index.html`, `sw.js` mit v25, `vuno-sportheim.js`, `migration_6.sql`), `Desktop\VUNO-Logo-Update\Logo-scharf` sowie `index.html`, `modern.css`, `sw.js`, `vuno-start.js` direkt in `Desktop\VUNO-Logo-Update` (Zwischenstand, nicht die Endfassung).
+- Dateien der Live-Fassung (29): `index.html`, `style.css`, `modern.css`, `app.js`, `account.js`, `config.js`, `manifest.webmanifest`, `sw.js`, `_headers`, `vendor/qrcode.js`, `vuno-logo-kopf.png`, `icon-180/192/512.png`, `vuno-farbe.js` (im `<head>`), `vuno-glas.css`, `vuno-start.js`, `vuno-seiten.js`, `vuno-zurueck.js`, `vuno-sportheim.js`, `vuno-ruhe.js` (als letztes Skript), `img/*.jpg` (8 Bilder). Alle `vuno-*`-Dateien sind Zusätze, die nach `app.js` laden und `app.js` selbst nicht verändern.
+
+**Was geändert wurde**
+- **Sportheim** (`vuno-sportheim.js`, `migration_6.sql`): Reiter „Alle / Sporthallen / Sportplätze“ entfernt, dafür „Belegung“, „Speisekarte“ und „Aktion“. Bearbeiten (✏️ / 🗑️, Löschen mit zweimal Tippen) nur für Admins und Sportheim-Admins; der Admin legt Sportheim-Admins in der Verwaltung fest. Tabellen `sportheim_admins`, Speisekarte und Aktionen mit RLS.
+- **Team-Kacheln mit Fotos:** Im Menüpunkt „Teams“ haben jetzt auch 1. und 2. Mannschaft, Verein, A- bis F-Jugend und Bambini Bild-Kacheln.
+- **Tab-Leiste** unten heller grau statt fast schwarz.
+- **Logo in der Kopfzeile** scharf (hochaufgelöstes `vuno-logo-kopf.png`).
+- **Design „Dunkel & Leuchten“** (Variante 3 von 5 Vorschlägen, `vuno-glas.css`): farbige Flächen als leuchtendes Glas mit abgerundeten Kanten, Breaking-News-Banner etwas heller.
+- **Flackern behoben:** Bilder beim Start (Vorladen, feste Größen, `vuno-ruhe.js`) und beim Über-den-Rand-Ziehen (Overscroll gesperrt, fester Hintergrund).
+- **Banner beim Kaltstart** erschien kurz grün (Standardfarbe vor dem Laden der Vereinsfarbe). `vuno-farbe.js` setzt die zuletzt bekannte Vereinsfarbe jetzt sofort im `<head>`.
+- **Präsentationen** (nur Dateien, nicht in der App), auf dem PC in `Desktop\VUNO-Logo-Update\Praesentation`:
+  - `VUNO-Funktionen-Mindmap.pptx/.pdf` – alle Funktionen als Mindmap (16 Folien)
+  - `So-funktioniert-VUNO.pptx/.pdf/.odp` – Ablauf der App (22 Folien)
+  - `VUNO-fuer-den-Verein.pptx/.pdf` – für die Vereinsvorstellung: Positionen, Rechte, Kacheln, Symbole, ohne Technik (22 Folien, mit Sprechernotizen)
+
+**Was offen ist**
+- **Live-Fassung nach GitHub übernehmen** (gilt weiter und betrifft jetzt v25–v33 zusätzlich). Laut Eintrag oben hat eine andere Sitzung am 10.11. in `main` einen eigenen Ladebildschirm, `app/logo.png` und neue Icons gepusht. Das passt nicht zur Live-Fassung (dort Icons und Kopf-Logo bereits anders). Vor dem nächsten Upload klären, welche Fassung führt.
+- **Doppelte Nummer `migration_6.sql`:** Der Breaking-News-Nachtrag oben nennt ebenfalls `migration_6.sql`. Die Live-App nutzt für News die Tabelle `news` aus einer früheren Migration. Die Sportheim-Datei sollte im Repo eine eigene, freie Nummer bekommen.
+- Flackern und grüner Start-Banner: Nutzer hat die Behebung auf dem Handy noch nicht bestätigt. Dazu die App einmal ganz schließen und zweimal neu starten, damit Cache v33 greift.
+- OpenOffice 4 zeigt die PowerPoint-Dateien fehlerhaft (unsichtbarer Text). Zum Vorführen die PDF oder PowerPoint/LibreOffice nutzen.
+- Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
