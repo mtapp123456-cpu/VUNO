@@ -258,3 +258,5 @@ body.gated { padding-bottom: 24px; }
 #splash img { width: min(86vw, 420px); height: auto; animation: splash-in .8s ease-out both; }
 @keyframes splash-in { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { #splash, #splash img { animation: none; transition: none; } }
+.vuno-mark{height:34px;width:34px;border-radius:8px;flex:none;display:block}
+body.gated .vuno-mark{display:none}
