@@ -117,3 +117,21 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Flackern und grüner Start-Banner: Nutzer hat die Behebung auf dem Handy noch nicht bestätigt. Dazu die App einmal ganz schließen und zweimal neu starten, damit Cache v33 greift.
 - OpenOffice 4 zeigt die PowerPoint-Dateien fehlerhaft (unsichtbarer Text). Zum Vorführen die PDF oder PowerPoint/LibreOffice nutzen.
 - Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+
+## 10.11.2026 – Erster Zurück-Knopf „‹ Zurück“, Nachtrag (Claude, Chat vom 07.11., ca. 23:05–23:20)
+
+**Letzter Stand:** Kein ZIP und kein Commit im GitHub-Projekt. Die Änderung wurde am 07.11. gegen 23:20 direkt bei Cloudflare als neue Produktions-Bereitstellung von `vuno-app` hochgeladen (über „Bereitstellung erstellen“ im Dashboard, Vorgänger war `71ff75c2`). Die neue Bereitstellungs-ID wurde nicht notiert; nach der Reihenfolge im Eintrag „Zurück-Pfeil auf der Breaking-News-Seite“ ist es sehr wahrscheinlich `2c86b07d`. Service-Worker-Cache `vereins-app-v19`.
+- Hochgeladen wurden alle 15 Dateien der damaligen Live-Fassung. Neu oder geändert waren nur `vuno-zurueck.js` (neu), `index.html` (Skript `vuno-zurueck.js` nach `vuno-start.js` eingebunden), `modern.css` (Stil für den Knopf angehängt) und `sw.js` (Cache v18 → v19, `vuno-zurueck.js` in der Dateiliste). Die übrigen Dateien kamen unverändert aus der Live-Seite.
+- Auf dem PC liegt dazu der Ordner `Desktop\VUNO-Logo-Update\Zurueck-Pfeil-Update` (`vuno-zurueck.js`, `index.html`, `modern.css`, `sw.js`). **Achtung:** `index.html` und `modern.css` dort beruhen auf den älteren Dateien in `Desktop\VUNO-Logo-Update` und sind nicht identisch mit dem, was hochgeladen wurde. Nicht als Grundlage verwenden.
+
+**Was geändert wurde**
+- Neue Datei `vuno-zurueck.js` (lädt nach `app.js` und ändert `app.js` nicht): Zurück-Knopf „‹ Zurück“ in Vereinsfarbe mit weißem Rand, schwebend links unter der Kopfzeile. Auf der Startseite und der Anmeldeseite (`body.gated`) ausgeblendet. Platz oben im Inhalt über `body.has-back #app { padding-top:56px }`.
+- Der Knopf geht im Browserverlauf eine Seite zurück. Jeder Seitenwechsel bekommt dafür eine laufende Nummer (`history.state.vunoIdx`). Wurde die App direkt auf einer Unterseite geöffnet, führt er zu `#start` statt aus der App hinaus.
+- `history.replaceState` wird umhüllt, damit die Nummer beim Reiterwechsel Sportplätze/Sporthallen (`facgroup` in `app.js`) erhalten bleibt.
+- Ist ein Fenster offen (`#backdrop` ohne `hidden`), schließt der Knopf zuerst dieses.
+- In der Live-App in Handygröße geprüft: Teams → Mannschaft → Zurück → Teams → Zurück → Start, Knopf auf der Startseite ausgeblendet.
+
+**Was offen ist**
+- Dieser Stand ist überholt: Der Knopf wurde danach kleiner gemacht und für das Breaking-News-Fenster erweitert (v20, siehe Eintrag „Zurück-Pfeil auf der Breaking-News-Seite“) und später noch feiner (v21 und später). Hier nur zur Nachvollziehbarkeit.
+- Wie bei den anderen Einträgen: `vuno-zurueck.js` und die übrigen Live-Dateien sind nicht in GitHub `main`.
+- Hinweis zum Hochladen per Skript: Ein direkter API-Aufruf zum Anlegen der Bereitstellung aus dem Dashboard heraus wurde von der Cloudflare-Firewall blockiert (403). Funktioniert hat der normale Weg über „Bereitstellung erstellen“ mit allen Dateien.
