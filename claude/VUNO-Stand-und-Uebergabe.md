@@ -182,4 +182,38 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Spiele werden nur über das Wort „Spiel“ im Titel erkannt. Ein eigenes Feld „Art: Spiel/Training“ gibt es nicht. Termine ohne dieses Wort fehlen in der Liste.
 - Nicht auf einem echten Handy geprüft.
 - Weiterhin: Live-Fassung nach GitHub übernehmen (siehe Einträge oben). `vuno-start.js` ist nicht im Repo.
+
+## 10.11.2026 – Fußball-Reiter bis Bambini, Fahrergruppen, Mitglieder & Fans nur ansehen, Nachtrag (Claude, Chat vom 07.11., ca. 19:34–20:25)
+
+**Letzter Stand:** Kein ZIP und kein Commit im GitHub-Projekt. Alle Änderungen wurden am 07.11. direkt bei Cloudflare als neue Produktions-Bereitstellungen von `vuno-app` hochgeladen (Direkt-Upload aus dem Dashboard-Browser, Grundlage jeweils die Live-Dateien). Reihenfolge der Bereitstellungen:
+- `c5f21680` – Fußball-Reiter, Service-Worker-Cache `vereins-app-v15` (Vorgänger `99cfcb45`)
+- `7a273759` – Fahrergruppen und 500 Plätze, Cache `vereins-app-v16`
+- `89c039de` – Fan-Vorschau, Cache `vereins-app-v17`
+
+Damals bestand die Live-Fassung aus 12 Dateien: `index.html`, `style.css`, `modern.css`, `app.js`, `account.js`, `config.js`, `vendor/qrcode.js`, `manifest.webmanifest`, `icon-180/192/512.png`, `sw.js`. Geändert wurden nur `app.js`, `account.js`, `style.css` und `sw.js`. Diese Stände sind in alle späteren Live-Fassungen (v18 bis v33) eingeflossen und **nicht in GitHub `main`**.
+
+Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). Diese Änderungen liegen als SQL nicht im Repo.
+
+**Was geändert wurde**
+- **Teams (Daten im Testverein):** Team „Jugend“ gelöscht (es hingen keine Termine daran). Neu angelegt sind A-Jugend (U19), B-Jugend (U17), C-Jugend (U15), D-Jugend (U13), E-Jugend (U11), F-Jugend (U9) und Bambini (G-Jugend · U7), jeweils mit Abteilung „Fußball“, Symbol ⚽ und eigener Farbe, `sort` 7–13. „Mitglieder & Fans“ steht auf `sort` 14.
+- **Fußball mit Reitern** (`app.js`): Die Gruppe `START_GROUPS.fussball` hat jetzt die Namen 1. Mannschaft, 2. Mannschaft, A-Jugend bis Bambini und `tabs: true`. `viewGroup('fussball')` zeigt eine seitlich wischbare Reiterleiste (`.seg.seg-scroll`, Aktion `grouptab`, Auswahl in `sel.groupTab`). Darunter steht direkt die Seite der gewählten Mannschaft (`viewTeam`). Die Startkachel zeigt „1. Mannschaft · 2. Mannschaft · A-Jugend bis Bambini“ (`groupSub`). CSS für `.seg-scroll` in `style.css`.
+- **Mitglieder & Fans ohne Termine** (`app.js`): `isFanTeam()` erkennt die Gruppe am Namen. `canBook()` ist dort immer `false`. Statt „+ Termin eintragen“ gibt es den Button „🚗 Fahrergruppe erstellen“.
+- **500 Plätze bei Mitglieder & Fans** (`app.js`): `maxPlayers()` liefert 500 statt 50, die Anzeige lautet „x/500 Mitglieder“. Eintragen und Entfernen dürfen weiter Admins und Trainer (`canManagePlayers()`).
+- **Fahrergruppen** (`app.js`, `style.css`): Liste „🚗 Fahrergruppen“ auf der Seite von Mitglieder & Fans. Jede Gruppe hat immer einen Fahrer und 4 Plätze. Angegeben werden Ziel, Datum, Abfahrt, Treffpunkt, Fahrer und Hinweis. Mitglieder & Fans tragen sich selbst mit „Mitfahren“ ein und mit „Nicht mehr mitfahren“ wieder aus. Löschen dürfen der Fahrer und die Admins.
+- **Fan-Vorschau für die Testphase** (`account.js`, `app.js`, `style.css`): Unter ⚙️ Einstellungen → „Testphase“ gibt es „👀 Als Fan ansehen“. Der Knopf ist nur sichtbar, wenn `openAccess` an ist. Die App zeigt sich dann wie für ein Mitglied, das nur in Mitglieder & Fans ist: Kalender nur ansehen, kein „+“, Termine ohne Speichern und Löschen, keine 👍❓👎. Ein gelber Balken oben beendet die Vorschau. Die Vorschau ändert nur die Anzeige; die Rechte am Server bleiben die echten.
+- **Supabase (SQL-Editor):**
+  - Neue Tabellen `rides` und `ride_passengers` mit RLS. Lesen dürfen aktive Mitglieder des Vereins. Anlegen darf jedes aktive Mitglied als Fahrer. Ändern und Löschen dürfen der Fahrer und die Admins. `seats` hat den Standard 4 und ist auf 1–4 begrenzt.
+  - Neue Funktion `join_ride(p_ride, p_name)` (security definer). Sie verhindert, dass mehr als 4 Mitfahrer eingetragen werden oder der Fahrer bei sich selbst mitfährt.
+  - `add_team_player` neu: Für „Mitglieder & Fans“ gilt eine Grenze von 500, für alle anderen Mannschaften weiter 50 Spieler.
+  - `can_book` neu: Für die Gruppe „Mitglieder & Fans“ immer `false`, auch für Admins und Trainer. Die Datenbank lehnt Termine dort also ab (geprüft: Fehler `42501`).
+  - Neue Funktion `can_manage_team` (die alte `can_book`-Logik). `remove_team_player` nutzt jetzt diese Funktion, damit Admins und Trainer in Mitglieder & Fans weiter Leute entfernen können (geprüft).
+- Getestet in der Live-App: Fußball-Reiter (Bambini angetippt) funktionieren. Eine Testfahrt mit 4 Plätzen erscheint richtig. Der Fahrer kann bei sich selbst nicht mitfahren, und 5 Plätze lehnt die Datenbank ab. Die Testfahrt und der Test-Fan wurden danach wieder gelöscht. Die Fan-Vorschau funktioniert in beide Richtungen.
+
+**Was offen ist**
+- **Die SQL-Änderungen ins Repo übernehmen** (z. B. als neue Migration mit freier Nummer): `rides`, `ride_passengers`, `join_ride`, `add_team_player` (500), `can_book` (Sperre für Mitglieder & Fans), `can_manage_team`, `remove_team_player`. Sie liegen bisher nur in der Datenbank.
+- **Live-Fassung nach GitHub übernehmen** (gilt weiter, siehe Einträge oben). Der Code für Fußball-Reiter, Fahrergruppen und Fan-Vorschau steckt nur in `app.js`, `account.js` und `style.css` der Live-Seite.
+- Hinweis zu den späteren Einträgen: Der Eintrag vom 08.–10.11. erwähnt Foto-Kacheln für A- bis F-Jugend und Bambini. Diese Teams stammen aus dieser Sitzung.
+- „Mitfahren“ wurde nur mit dem Testkonto geprüft, das zugleich Fahrer war. Mit einem zweiten Gerät als echter Mitfahrer ist es noch nicht durchgespielt.
+- Die Erkennung von „Mitglieder & Fans“ läuft über den Teamnamen (App und Datenbank, Muster `mitglieder … & / und … fans`). Wird die Gruppe umbenannt, greifen die Regeln nicht mehr. Besser wäre später ein eigenes Feld am Team.
+- Im offenen Testzugang ist jeder Admin. Die Sperre für Mitglieder & Fans sieht man dort nur über die Fan-Vorschau.
 - Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
