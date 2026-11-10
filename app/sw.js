@@ -1,6 +1,6 @@
 // Hält nur die App-Dateien bereit. Vereinsdaten werden nie zwischengespeichert.
-const CACHE = 'vereins-app-v4';
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'account.js', 'config.js', 'vendor/qrcode.js', 'manifest.webmanifest', 'icon-192.png'];
+const CACHE = 'vereins-app-v5';
+const FILES = ['./', 'index.html', 'style.css', 'app.js', 'account.js', 'config.js', 'vendor/qrcode.js', 'manifest.webmanifest', 'icon-192.png', 'logo.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

@@ -251,3 +251,10 @@ body.gated { padding-bottom: 24px; }
 @media (prefers-color-scheme:dark){
   .attbtn.on.yes{background:#14532d}.attbtn.on.maybe{background:#5c3d0a}.attbtn.on.no{background:#5c1414}
 }
+
+/* Ladebildschirm: Logo ca. 3 Sekunden */
+#splash { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #000; transition: opacity .4s ease; }
+#splash.out { opacity: 0; pointer-events: none; }
+#splash img { width: min(86vw, 420px); height: auto; animation: splash-in .8s ease-out both; }
+@keyframes splash-in { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { #splash, #splash img { animation: none; transition: none; } }
