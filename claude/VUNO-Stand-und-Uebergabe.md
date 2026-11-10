@@ -270,3 +270,25 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 - Diese Teile sind durch spätere Sitzungen teilweise überholt. Laut der Wunschliste wird „Jugend“ in Reiter von A-Jugend bis Bambini aufgeteilt, das Sportheim hat andere Reiter, und es gibt Foto-Kacheln (`vuno-seiten.js`, Zuordnung über den Kachelnamen). Beim Übernehmen ins Repo prüfen, ob die Fußball-Gruppe in `START_GROUPS` noch „Jugend“ erwartet oder die neuen Jugend-Teams.
 - Weil die Zuordnung über den Namen läuft, landet ein umbenanntes Team (z. B. „F-Jugend“ statt „Jugend“) als eigene Kachel auf der Startseite.
 - Weiterhin: Live-Fassung (inklusive dieser Änderungen in `app.js`) nach GitHub übernehmen. Prüfung auf einem echten Handy. Vor Live-Gang `openAccess` in `config.js` auf `false` setzen und in Supabase `update public.clubs set open_access = false;` ausführen.
+
+## 10.11.2026 – Modernes Design und neue Tab-Leiste, Nachtrag (Claude, Chat vom 07.11., ca. 17:10–17:30)
+
+**Letzter Stand:** Kein Commit im GitHub-Projekt und kein ZIP als Datei. Die Änderung wurde am 07.11. um 17:27 direkt bei Cloudflare als Produktions-Bereitstellung von `vuno-app` hochgeladen (über „Bereitstellung erstellen“ im Dashboard, ZIP `vuno-app.zip` im Browser aus den Live-Dateien gebaut). Bereitstellung `1bdf6555`, Vorgänger `3b620fa6` (07.11., 15:43). Service-Worker-Cache `vereins-app-v11` → `vereins-app-v12`. Das ist der **früheste** der Cloudflare-Stände vom 07.11. abends und ist durch alle Einträge oben (v17 bis v33) längst überholt.
+- Hochgeladen wurden 12 Dateien: `index.html`, `style.css`, `modern.css` (neu), `app.js`, `account.js`, `config.js`, `sw.js`, `manifest.webmanifest`, `vendor/qrcode.js`, `icon-180/192/512.png`. Geändert waren nur `index.html`, `sw.js` und die neue `modern.css`. Alle anderen kamen unverändert von der Live-Seite.
+- Auf dem PC liegen dieselben drei Dateien in `Downloads\Sportverein-App--master\VUNO-Design-Update` (`index.html`, `modern.css`, `sw.js`). Später hat eine andere Sitzung dort noch `vuno-logo.svg`/`vuno-logo.png` abgelegt (siehe Eintrag „VUNO-Logo in der Kopfzeile“). Der Ordner ist überholt und **nicht als Grundlage verwenden**.
+- `Downloads\Sportverein-App--master` selbst ist eine **alte Offline-Fassung** der App (ohne Supabase, ohne VUNO, Daten nur im Browser). Nicht damit weiterbauen.
+- Vorab entstand ein Entwurf der Startseite als claude.ai-Artefakt „VUNO App – Startseite“ (Design-Canvas, https://claude.ai/artifact/UPFXGPdPGfc6QkJLP16ZhZ), nachgebaut nach einem Screenshot des Nutzers. Nur Entwurf, kein App-Code.
+
+**Was geändert wurde**
+- Neue Datei `modern.css`, in `index.html` nach `style.css` eingebunden. Sie ändert nur das Aussehen und nutzt weiter die Vereinsfarben (`--brand`, `--brand-2`). `app.js` blieb unverändert.
+- **Tab-Leiste:** schwebend, abgerundet, dunkel. Emojis durch SVG-Symbole ersetzt, jeder Reiter mit eigener Farbe (Start blau, Teams grün, Belegung orange, Kalender lila). Der aktive Reiter ist voll eingefärbt, leicht angehoben und hat einen Punkt darunter.
+- **Plus-Knopf** von rechts in die Mitte der Tab-Leiste verschoben (Lücke `.tab-gap` zwischen Teams und Belegung). Wer nur lesen darf, sieht keinen Plus-Knopf und keine Lücke.
+- **Startseite:** rundere Vereinskarte mit Glas-Kästchen für die drei Zahlen, Breaking News als runde Leiste mit pulsierendem Punkt, Kacheln höher mit farbiger Symbolfläche und Pfeil-Kreis. Die einspaltige Mannschaftsliste unter „Teams“ bleibt eine Zeile.
+- Nach dem Hochladen in der Live-App in Handygröße geprüft: `modern.css` geladen, 4 Tabs, 9 Kacheln.
+
+**Was offen ist**
+- Überholt durch spätere Stände: Die Tab-Leiste ist inzwischen hellgrau, die Kacheln sind Foto-Kacheln, das Design ist „Dunkel & Leuchten“ (siehe Einträge oben). `modern.css` ist weiter Teil der Live-Fassung und wurde von späteren Sitzungen erweitert.
+- Der Entwurf hatte einen Reiter „Mehr“ und ein Stadionfoto in der Vereinskarte. Beides wurde nicht in die App übernommen.
+- Wie bei allen Einträgen: `modern.css` und die übrigen Live-Dateien sind nicht in GitHub `main`.
+- Nicht auf einem echten Handy geprüft.
+- Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
