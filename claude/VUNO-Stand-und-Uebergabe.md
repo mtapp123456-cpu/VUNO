@@ -238,3 +238,35 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 - Wie bei den anderen Einträgen: `vuno-start.js` und die übrigen Live-Dateien sind nicht in GitHub `main`.
 - „Anstehende Spiele“ erkennt Spiele nur am Wort „Spiel“ im Termintitel (Heimspiel, Auswärtsspiel, Punktspiel …). Termine ohne dieses Wort fehlen in der Liste.
 - Hinweis zum Hochladen: Das ZIP wurde im Dashboard per Skript gebaut und in das Datei-Feld „Datei auswählen“ gelegt (DataTransfer); die Live-Dateien ließen sich aus dem Dashboard heraus von vuno-app.pages.dev laden. Der Klick auf „Speichern und bereitstellen“ erfolgte erst nach ausdrücklicher Freigabe des Nutzers.
+
+## 10.11.2026 – Sportplatzbelegung mit zwei Reitern, neue Abteilungen, Startseite neu geordnet, Nachtrag (Claude, Chat vom 07.11., ca. 19:10–19:35)
+
+**Letzter Stand:** Kein ZIP als Datei und kein Commit im GitHub-Projekt, weil GitHub an diesem Abend gesperrt war. Die Änderungen wurden zweimal direkt bei Cloudflare als Produktions-Bereitstellung von `vuno-app` hochgeladen, über „Bereitstellung erstellen“ im Dashboard. Das ZIP (`vuno-app.zip`, 12 Dateien) wurde jeweils im Browser aus den Live-Dateien gebaut. Die Bereitstellungs-IDs wurden nicht notiert. Service-Worker-Cache zuerst `vereins-app-v12` → `v13`, dann `v13` → `v14`.
+- Damals bestand die Live-Fassung nur aus 12 Dateien: `index.html`, `style.css`, `modern.css`, `config.js`, `app.js`, `account.js`, `vendor/qrcode.js`, `manifest.webmanifest`, `sw.js`, `icon-180/192/512.png`. Außer `app.js` und `sw.js` wurden alle unverändert übernommen.
+- Der Ordner `Downloads\Sportverein-App--master\Sportverein-App--master` auf dem PC ist eine **alte Fassung** (nur `localStorage`, ohne Supabase und Anmeldung). Er war nicht die Grundlage und sollte nicht weiterverwendet werden.
+- **Achtung:** Anders als die späteren `vuno-*.js`-Zusätze wurden diese Änderungen **direkt in `app.js`** eingebaut. Sie stecken in jeder späteren Live-Fassung, aber nicht in GitHub `main`.
+
+**Was geändert wurde**
+1. **Sportplatzbelegung** (`app.js`, Cache v13):
+   - Auf der Startseite gibt es statt der Kacheln „Sportplätze“ und „Sporthallen“ nur noch eine Kachel „🏟️ Sportplatzbelegung“ mit der Unterzeile „x Plätze · y Hallen“. Sie führt zu `#anlagen-platz`.
+   - In `viewAnlagen()` zeigen `#anlagen-platz` und `#anlagen-halle` die Überschrift „Sportplatzbelegung“ und zwei Reiter, „Sportplätze“ und „Sporthallen“. Neue Aktion `facgroup` wechselt den Reiter über `history.replaceState`, ohne dass die Seite nach oben springt. Neue Hilfsfunktion `facCardHTML`.
+   - Auf der Detailseite einer Anlage heißt der Zurück-Link „‹ Sportplatzbelegung“. Die Ansicht `#anlagen` (Tab „Belegung“) mit „Alle / Sportplätze / Sporthallen / Sportheim“ blieb unverändert.
+2. **Neue Abteilungen** in Supabase, angelegt über Verwaltung → Teams im Testverein (das ist Datenbank, nicht Code):
+   - 🤸 Turnen (Abteilung Turnen, `#db2777`)
+   - 🧒 Jugend (Abteilung Jugend, `#0d9488`)
+   - 📣 Mitglieder & Fans (Abteilung Mitglieder & Fans, `#ca8a04`)
+3. **Startseite neu geordnet** (`app.js`, Cache v14). Neue Funktionen `startTeamTiles()`, `viewGroup()`, `findTeam()` und `START_GROUPS` sowie die Route `#gruppe-…`. Die Kacheln stehen in dieser Reihenfolge:
+   - ⚽ Fußball → `#gruppe-fussball` mit 1. Mannschaft, 2. Mannschaft und Jugend
+   - Basketball, Kendo und Turnen einzeln
+   - weitere, nicht zugeordnete Teams einzeln
+   - 🍻 Verein & Kalender → `#gruppe-verein` mit „Verein“ und dem Vereinskalender (die Kachel „Vereinskalender“ ist entfallen)
+   - 📣 Mitglieder & Fans
+   - Sportplatzbelegung und Sportheim
+
+   Die Teams werden über ihren **Namen** zugeordnet: „1. Mannschaft“, „2. Mannschaft“, „Jugend“, „Basketball“, „Kendo“, „Turnen“, „Verein“, „Mitglieder & Fans“.
+- Geprüft wurde nach jedem Upload in der Live-App im eingebauten Browser auf dem PC: die Kacheln, beide Reiter und die beiden Gruppen-Seiten.
+
+**Was offen ist**
+- Diese Teile sind durch spätere Sitzungen teilweise überholt. Laut der Wunschliste wird „Jugend“ in Reiter von A-Jugend bis Bambini aufgeteilt, das Sportheim hat andere Reiter, und es gibt Foto-Kacheln (`vuno-seiten.js`, Zuordnung über den Kachelnamen). Beim Übernehmen ins Repo prüfen, ob die Fußball-Gruppe in `START_GROUPS` noch „Jugend“ erwartet oder die neuen Jugend-Teams.
+- Weil die Zuordnung über den Namen läuft, landet ein umbenanntes Team (z. B. „F-Jugend“ statt „Jugend“) als eigene Kachel auf der Startseite.
+- Weiterhin: Live-Fassung (inklusive dieser Änderungen in `app.js`) nach GitHub übernehmen. Prüfung auf einem echten Handy. Vor Live-Gang `openAccess` in `config.js` auf `false` setzen und in Supabase `update public.clubs set open_access = false;` ausführen.
