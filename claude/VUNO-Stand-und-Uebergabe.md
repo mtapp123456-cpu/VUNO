@@ -135,3 +135,27 @@ Neue Einträge werden unten angefügt. Bestehende Einträge bleiben stehen.
 - Dieser Stand ist überholt: Der Knopf wurde danach kleiner gemacht und für das Breaking-News-Fenster erweitert (v20, siehe Eintrag „Zurück-Pfeil auf der Breaking-News-Seite“) und später noch feiner (v21 und später). Hier nur zur Nachvollziehbarkeit.
 - Wie bei den anderen Einträgen: `vuno-zurueck.js` und die übrigen Live-Dateien sind nicht in GitHub `main`.
 - Hinweis zum Hochladen per Skript: Ein direkter API-Aufruf zum Anlegen der Bereitstellung aus dem Dashboard heraus wurde von der Cloudflare-Firewall blockiert (403). Funktioniert hat der normale Weg über „Bereitstellung erstellen“ mit allen Dateien.
+
+## 10.11.2026 – Werbevideo für VUNO (Claude, Chat vom 09.–10.11.)
+
+**Letzter Stand:** In dieser Sitzung ist **keine neue Version und kein neues ZIP der App** entstanden, und an der App wurde **nichts geändert**. Live bleibt `vuno-app.pages.dev` (Cloudflare, Direkt-Upload, Service-Worker-Cache `vereins-app-v33`). GitHub `main` ist unverändert bis auf diesen Eintrag. Entstanden sind nur Werbematerialien (Videos), keine App-Dateien.
+
+**Was entstanden ist** (alles Hochformat, mit leiser selbst erzeugter Hintergrundmusik, ohne gesprochene Stimme)
+- `VUNO_Werbevideo.mp4` – Kurzfassung 40 s: Chaos im Chat, Logo, App-Kacheln, Abstimmung, News und Fahrergruppe, Sportplatzbelegung, QR-/E-Mail-Anmeldung, Aufruf „Jetzt Testverein werden“.
+- `VUNO_Vereinsprobleme_Loesung_klein.mp4` – 56 s: sechs typische Vereinsprobleme (Zusagen im Chat, doppelt belegte Hallen, Fahrdienste per Zuruf, Infos erreichen nicht alle, Listen auf Papier/Excel, überlastete Ehrenamtliche) und die Lösung mit VUNO.
+- `VUNO_Langfassung_klein.mp4` – 2:35 min, 12 Szenen mit eingebrannten Untertiteln und Beispiel-Ansichten im Handy-Rahmen.
+- `VUNO_ohne_Untertitel.mp4` – dieselbe Langfassung ohne Untertitel (für CapCut o. Ä.), dazu `VUNO_Untertitel.srt` (46 Untertitel mit Zeitmarken) und `Sprechertext_VUNO.txt` (Sprechertext mit Zeitmarken pro Szene).
+- Seite mit Lang- und Kurzfassung, Sprechertext und Knopf „Mit Männerstimme abspielen“ (Gerätestimme, optional Bildbeschreibung für Blinde): claude.ai-Artefakt „VUNO – One Team, One App | Werbevideo“, nur für den Nutzer sichtbar (https://claude.ai/artifact/AHDBsaqJhBdjqV3jgSbvr6).
+- Die Dateien wurden dem Nutzer im Chat geschickt. Sie liegen **nicht im GitHub-Projekt** und nicht auf dem PC. Auch die Skripte zum Erzeugen (Python, `vuno.py`/`build.py`) liegen nur im Arbeitsbereich dieser Sitzung und können verloren gehen.
+
+**Wichtige Hinweise zum Inhalt**
+- Die Beispiel-Ansichten sind **von Claude nachgezeichnet**, keine echten Bildschirmaufnahmen der App (im Video als „Beispiel-Ansicht“ gekennzeichnet). Das V-Logo ist ebenfalls nachgezeichnet, nicht `app/logo.png`.
+- Namen im Video (Lena, Max, Jonas, Mia, Tom usw.) und Beispieldaten sind erfunden.
+- Das Video zeigt Funktionen laut Wunschliste (u. a. Plus-Knopf bis 50 Spieler, Begründung bei ❓/👎, Fahrergruppen 1 Fahrer + 4 Plätze, Mitglieder & Fans mit 500 Plätzen, zwei Reiter bei der Sportplatzbelegung). Ob alles so in der Live-App läuft, wurde **nicht gegen die Live-Seite geprüft**.
+
+**Was offen ist**
+- **Stimme im Video fehlt.** Claude hat in der Arbeitsumgebung keine Sprachausgabe. Die Verbindungen „Speko“ und „ElevenLabs“ sind im Konto angelegt, stehen aber auf „Verbindung unvollständig“ und waren in der Sitzung nicht nutzbar. Weg 1: Verbindung abschließen, dann lässt Claude den Sprechertext mit deutscher Männerstimme einsprechen und legt ihn unter das Video. Weg 2: In CapCut `VUNO_ohne_Untertitel.mp4` und `VUNO_Untertitel.srt` importieren und „Text zu Sprache“ mit Männerstimme nutzen. Danach die Audiodatei an Claude schicken, falls sie ins Video eingebaut werden soll.
+- Vor Veröffentlichung: Funktionen im Video gegen die Live-App prüfen und Szenen anpassen, die nicht zutreffen.
+- Im Schlussbild fehlt eine Web-Adresse oder ein Kontakt für „Jetzt Testverein werden“. Die Testseite ist ohne Anmeldung offen (siehe `openAccess`), deshalb Adresse erst einsetzen, wenn das gewollt ist.
+- Optional: echte Bildschirmaufnahmen der App am Handy aufnehmen und schicken, dann ersetzt Claude die nachgebauten Beispiel-Ansichten; echtes Logo `app/logo.png` einbauen; Querformat-Version für YouTube/Webseite.
+- Unverändert offen: Live-Fassung nach GitHub übernehmen, Prüfung auf einem echten Handy, vor Live-Gang `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
