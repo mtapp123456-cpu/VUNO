@@ -292,3 +292,25 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 - Wie bei allen Einträgen: `modern.css` und die übrigen Live-Dateien sind nicht in GitHub `main`.
 - Nicht auf einem echten Handy geprüft.
 - Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+
+## 18.11.2026 – Einladung mit Rechten und Ansicht für Eingeladene (Claude, Chat vom 18.11.)
+
+**Letzter Stand:** Die Live-App läuft inzwischen als **OrgaMe** unter **onbac.pages.dev** (Cloudflare-Projekt `onbac`, Direkt-Upload, 42 Dateien, Service-Worker-Cache `onbac-v106`, Bereitstellung `9f80cdc2`). vuno-app.pages.dev leitet dorthin weiter.
+- **Neu, als Vorschau bereitgestellt:** https://einladung.onbac.pages.dev (Cloudflare-Vorschau „einladung“, Stand v107 = Live-Fassung v106 + diese Änderung). **Noch nicht in Produktion** – das Hochladen nach onbac.pages.dev wurde in dieser Sitzung gesperrt und muss vom Nutzer freigegeben werden (gleiche ZIP-Erstellung, nur „Produktion“ wählen).
+- **Supabase: Migration ist eingespielt** (`supabase/migration_einladung_rechte.sql`). Test `supabase/test_einladung_rechte.sql` läuft im SQL-Editor und rollt alles zurück: 15/15 bestanden.
+- Code im GitHub-Zweig **`orgame-einladung`** (nicht in `main`): `app/orgame-einladung.js`, die Migration und der Test.
+
+**Was gebaut wurde**
+- Regel: Wer einlädt, kann nur Rechte und Mannschaften weitergeben, die er selbst hat. Die Datenbank prüft das (Funktion `orgame_einladung_erstellen`), die App zeigt Gesperrtes mit 🔒.
+- Rechte: Sportplätze belegen, Sporthallen belegen, Spieler verwalten, Breaking News posten (je Mannschaft), Sportheim verwalten, Mitglieder einladen (Verein). Admin = alles; Trainer = Plätze, Hallen, Spieler, News für eigene Mannschaften (wie bisher, aber ohne Einladen); Sportheim-Admins = Sportheim.
+- Neue Tabellen `member_rights`, `rights_invites`; Funktionen `orgame_rechte`, `orgame_darf`, `orgame_meine_rechte`, `orgame_einladung_erstellen/_info/_annehmen`, `orgame_vereine`. Erweitert: `can_book`, `can_manage_team`, `post_news` (eigenes News-Recht), `join_open_club` (Eingeladene werden im Testverein nicht automatisch Admin), Trigger `orgame_ort` auf `bookings` (Platz- bzw. Hallenrecht). Alte Funktionen gesichert in `orgame_backup_funcs`, Rückgängig-Anleitung am Ende der Migration.
+- Einladung: QR-Code/Link `?einladung=CODE`, 7 Tage, einmal nutzbar. Beim Einlösen zählt nur die gespeicherte Einladung (nicht der QR-Inhalt) und nur, was der Einladende dann noch hat.
+- App (`orgame-einladung.js`, lädt als letztes Skript; kleine Haken in `app.js` und `account.js`, beim Upload per Textersetzung eingebaut): Startbild „QR-Code scannen / Verein auswählen“ nach Entwurf des Nutzers im OrgaMe-Design; Einladungsseite; für Eingeladene Übersicht „Hallo …, Heute“ mit Plätzen/Hallen/Sportheim, „Belegung eintragen“ nur mit Recht, oben Reiter Übersicht · Kalender · Plätze · Sportheim · Mehr (untere Leiste ausgeblendet); „Mitglied einladen“ unter ⚙️ und unter „Mehr“.
+- In der Vorschau mit drei getrennten Browser-Sitzungen geprüft: Admin-Einladung → „Max Test“ (Plätze, News, Einladen für 1./2. Mannschaft) → Max lädt „Lisa Test“ ein (Hallen gesperrt, nur Plätze/1. Mannschaft möglich). Buchung Platz ok, Halle und fremde Mannschaft vom Server abgelehnt.
+
+**Was offen ist**
+- Produktion: Freigabe durch den Nutzer, dann v107 nach onbac.pages.dev hochladen.
+- Testdaten im Testverein „Orgame“: Mitglieder „Max Test“ und „Lisa Test“ (anonyme Konten) und deren Einladungen. Bei Bedarf in Verwaltung › Mitglieder entfernen.
+- Nur in Handygröße im Browser geprüft, noch nicht auf einem echten zweiten Handy. QR-Scan in der App nutzt die Kamera (Android: eingebaut, sonst Zusatz jsQR); alternativ den QR-Code mit der Handy-Kamera scannen.
+- Rechte nachträglich ändern oder entziehen geht noch nicht in der App (nur Mitglied entfernen).
+- Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
