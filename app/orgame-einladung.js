@@ -401,13 +401,15 @@
     const rows = list.map(f => {
       const bs = db.bookings.filter(b => b.date === t && b.facility === f.id).sort((a, b) => a.start.localeCompare(b.start));
       const live = bs.find(b => b.start <= n && n < b.end);
-      const next = live || bs.find(b => b.end > n) || bs[bs.length - 1];
-      return {f, bs, live, next};
-    }).sort((a, b) => (b.bs.length ? 1 : 0) - (a.bs.length ? 1 : 0) || (b.live ? 1 : 0) - (a.live ? 1 : 0) || ord[a.f.group] - ord[b.f.group] || a.f.name.localeCompare(b.f.name));
+      const offen = bs.filter(b => b.end > n);             // was heute noch kommt (oder gerade läuft)
+      const next = live || offen[0] || null;
+      return {f, bs: offen, live, next, had: bs.length > 0};
+    }).sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0) || (b.next ? 1 : 0) - (a.next ? 1 : 0) || ord[a.f.group] - ord[b.f.group] || a.f.name.localeCompare(b.f.name));
     const shown = max ? rows.slice(0, max) : rows;
-    return shown.map(({f, bs, live, next}) => {
-      const sub = next ? `<div>${ICON.ppl} ${live ? 'Aktiv: ' : ''}${H(team(next.team).name)}${next.title ? ' · ' + H(next.title) : ''}</div>` : '';
-      const right = next ? `${next.start} – ${next.end}${bs.length > 1 ? `<small>+${bs.length - 1} weitere</small>` : ''}` : '<span class="og-free">frei</span><small>ganztägig</small>';
+    return shown.map(({f, bs, live, next, had}) => {
+      const tn = next ? team(next.team).name : '';
+      const sub = next ? `<div>${ICON.ppl} ${live ? 'Aktiv: ' : ''}${H(tn)}${next.title && next.title !== tn ? ' · ' + H(next.title) : ''}</div>` : '';
+      const right = next ? `${next.start} – ${next.end}${bs.length > 1 ? `<small>+${bs.length - 1} weitere</small>` : ''}` : `<span class="og-free">frei</span><small>${had ? 'ab jetzt' : 'ganztägig'}</small>`;
       return `<a class="og-row ${live ? 'act' : ''}" href="#anlage-${H(f.id)}"><span class="og-ic">${icFor(f.group)}</span><span class="og-mid"><b>${H(f.name)}</b>${sub}</span><span class="og-rt">${right}</span><span class="og-chev">${ICON.chev}</span></a>`;
     }).join('') + (max && rows.length > max ? `<a class="og-more" href="#anlagen-${FACILITIES.some(f => f.group === 'platz') ? 'platz' : 'halle'}">Alle ${rows.length} Anlagen ansehen ›</a>` : '');
   }
@@ -602,7 +604,7 @@ body.og-ov-open{overflow:hidden}
 .og-or{display:flex;align-items:center;gap:14px;color:#9aa3b2;font-size:15px;margin:6px 4px}
 .og-or:before,.og-or:after{content:"";flex:1;height:1px;background:rgba(255,255,255,.2)}
 .og-search{display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:12px 18px;background:rgba(15,19,28,.78);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#cfd6e2}
-.og-search input{flex:1;background:transparent;border:0;outline:0;color:#fff;font:inherit;font-size:16px;padding:0}
+.og-search input{flex:1;background:transparent !important;border:0 !important;outline:0;box-shadow:none !important;color:#fff;font:inherit;font-size:16px;padding:0 !important;margin:0;min-width:0}
 .og-vlist{display:flex;flex-direction:column;gap:8px}
 .og-club{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(17,21,30,.85);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff;font:inherit;font-size:16px;font-weight:600;cursor:pointer}
 .og-club svg{margin-left:auto;color:#9aa3b2;flex:none}
