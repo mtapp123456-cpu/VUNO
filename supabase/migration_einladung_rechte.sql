@@ -223,15 +223,21 @@ begin
 
   select m.status into v_exist from public.members m where m.club_id = v.club_id and m.user_id = v_uid;
   if v_exist is null then
+    -- Wer Mannschaftsrechte bekommt (Belegen, Spieler verwalten), wird als Trainer/Betreuer geführt,
+    -- alle anderen als Spieler.
     insert into public.members (club_id, user_id, display_name, role, status, club_role)
-    values (v.club_id, v_uid, v_name, 'member', 'active', 'spieler');
+    values (v.club_id, v_uid, v_name, 'member', 'active',
+            case when v.rechte && array['platz', 'halle', 'spieler'] then 'trainer' else 'spieler' end);
   elsif v_exist = 'pending' then
     update public.members set status = 'active' where club_id = v.club_id and user_id = v_uid;
   end if;
 
   foreach v_t in array v.teams loop
     if exists (select 1 from public.orgame_rechte(v.club_id, v.created_by) r where r.team_id = v_t) then
-      insert into public.member_teams (club_id, user_id, team_id) values (v.club_id, v_uid, v_t) on conflict do nothing;
+      begin
+        insert into public.member_teams (club_id, user_id, team_id) values (v.club_id, v_uid, v_t) on conflict do nothing;
+      exception when others then null;  -- z. B. Mannschaft voll (50 Spieler): Rechte gelten trotzdem
+      end;
     else v_gekappt := v_gekappt + 1; end if;
   end loop;
 
