@@ -77,7 +77,7 @@ const $ = id => document.getElementById(id);
 function go(s){ S.screen=s; render(); scrollTo(0,0); }
 function bar(){ $('bar').innerHTML = '<b>Vorschau</b>' + steps.map(([k,l])=>`<button class="${S.screen===k||(k==='einladen'&&S.screen==='geteilt')||(k==='gast'&&S.screen==='drin')?'on':''}" onclick="go('${k}')">${l}</button>`).join(''); }
 function qr(){ let h=''; let seed=7; for(let i=0;i<441;i++){ const r=Math.floor(i/21), c=i%21; const f=(r<7&&c<7)||(r<7&&c>13)||(r>13&&c<7); let dark; if(f){ const rr=r%14>6?r-14:r, cc=c>13?c-14:c; const a=Math.max(Math.abs(rr-3),Math.abs(cc-3)); dark=a!==2; } else { seed=(seed*9301+49297)%233280; dark=seed/233280>.5; } h+=`<span class="${dark?'':'w'}"></span>`; } return `<div class="qr">${h}</div>`; }
-function top(rolle){ return `<div class="top"><span class="crest">T</span><span><b>${CLUB}</b><small>${rolle}</small></span><span class="badge">eingerichtet ✓</span></div>`; }
+function kopf(rolle){ return `<div class="top"><span class="crest">T</span><span><b>${CLUB}</b><small>${rolle}</small></span><span class="badge">eingerichtet ✓</span></div>`; }
 
 const V = {
   start: () => `<div class="pad" style="text-align:center">
@@ -88,7 +88,7 @@ const V = {
       <button class="btn sec" onclick="go('app')">🔑 Testzugang</button>
       <div class="note" style="text-align:left"><b>Neu:</b> Der Testzugang führt <b>direkt in den fertig eingerichteten Testverein</b> – ohne Verein anlegen, ohne Sportarten-Einrichtung. Den Verein legt der Käufer nur auf www.orga.me an.</div>
     </div>`,
-  app: () => `${top('Du bist: ' + ROLLEN[S.ich].n + (S.ich==='abt'?' · Fußball':S.ich==='trainer'?' · 1. Mannschaft':''))}
+  app: () => `${kopf('Du bist: ' + ROLLEN[S.ich].n + (S.ich==='abt'?' · Fußball':S.ich==='trainer'?' · 1. Mannschaft':''))}
     <div class="pad">
       <div class="card" style="margin-top:0"><b>Testen als</b><div class="chips">${Object.keys(ROLLEN).map(k=>`<button class="chip ${S.ich===k?'on':''}" onclick="S.ich='${k}';render()">${ROLLEN[k].n}</button>`).join('')}</div>
       <p class="sub" style="margin-top:8px">Im Testzugang kannst du jede Rolle ausprobieren.</p></div>
@@ -109,7 +109,7 @@ const V = {
     const abts = S.ich==='haupt' ? ABT : ABT.filter(a=>a[1]==='Fußball');
     if (!abts.some(a=>a[1]===S.abt)) S.abt = abts[0][1];
     const teams = S.ich==='trainer' ? ['1. Mannschaft'] : abts.find(a=>a[1]===S.abt)[2];
-    return `${top('Einladen als ' + r.n)}<div class="pad">
+    return `${kopf('Einladen als ' + r.n)}<div class="pad">
       <h1>Wen möchtest du einladen?</h1>
       <p class="sub">Du kannst nur eine Stufe unter dir einladen – und nur in deinem Bereich.</p>
       ${opt.map(([k,ic,t,d])=>{ const ok=r.kann.includes(k); return `<button class="row ${S.wen===k?'on':''} ${ok?'':'lock'}" ${ok?`onclick="S.wen='${k}';render()"`:''}><span class="ic">${ic}</span><span><b>${t}</b><small>${ok?d:'🔒 Nur ' + (k==='abt'||k==='vereinsqr'?'Hauptadmin':'Abteilungs-Admin oder höher')}</small></span></button>`; }).join('')}
@@ -127,7 +127,7 @@ const V = {
     const was = S.wen==='vereinsqr' ? 'Mitglied (Vereins-QR)' : ROLLEN[S.wen].n + ' · ' + (S.wen==='abt' ? S.abt : (S.team||'Mannschaft wählen'));
     S.gast = {rolle: S.wen==='vereinsqr' ? 'mitglied' : S.wen, abt:S.abt, team:S.team, von: ROLLEN[S.ich].n};
     const text = `Hallo! Du bist bei OrgaMe für ${CLUB} eingeladen – als ${was}. Einfach hier tippen: orga.me/e/K7QM-28XP`;
-    return `${top('Einladung erstellt')}<div class="pad">
+    return `${kopf('Einladung erstellt')}<div class="pad">
       <h1>${S.weg==='qr'?'QR-Code zeigen':S.weg==='wa'?'Per WhatsApp':'Per E-Mail'}</h1>
       <div class="chips"><span class="chip on">${was}</span></div>
       ${S.weg==='qr' ? `${qr()}<div class="code">K7QM-28XP</div><p class="sub" style="text-align:center;margin-top:6px">${S.wen==='vereinsqr'?'Bleibt gültig, bis du ihn zurückziehst · zum Ausdrucken':'7 Tage gültig · nur für eine Person'}</p>`
@@ -149,7 +149,7 @@ const V = {
       <button class="btn" onclick="go('drin')">Jetzt beitreten</button>
       <p class="sub" style="text-align:center;margin-top:10px">Anmelden später mit Apple, Google oder E-Mail – damit das Konto auch bei Handywechsel bleibt.</p></div>`; },
   drin: () => { const g = S.gast || {rolle:'trainer', abt:'Fußball', team:'1. Mannschaft'};
-    return `${top('Du bist: ' + ROLLEN[g.rolle].n + (g.rolle==='abt'?' · '+g.abt: g.team?' · '+g.team:''))}<div class="pad">
+    return `${kopf('Du bist: ' + ROLLEN[g.rolle].n + (g.rolle==='abt'?' · '+g.abt: g.team?' · '+g.team:''))}<div class="pad">
       <div class="ok">✓</div><h1 style="text-align:center">Willkommen, Max!</h1>
       <p class="sub" style="text-align:center">Du siehst sofort alles, was dein Admin schon eingerichtet hat.</p>
       <h2>${g.rolle==='abt'?'Deine Abteilung':'Deine Mannschaft'}</h2>
