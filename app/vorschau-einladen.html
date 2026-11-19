@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05070c">
+<title>OrgaMe – Vorschau Testzugang & Einladungen</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#05070c}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#eef1f6;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:460px;margin:0 auto;min-height:100vh;position:relative;
+ background:radial-gradient(ellipse 70% 30% at 50% 10%,rgba(30,144,255,.22),transparent 70%),radial-gradient(ellipse 60% 30% at 90% 80%,rgba(140,60,255,.12),transparent 70%),#070b14}
+.bar{position:sticky;top:0;z-index:20;display:flex;gap:6px;overflow-x:auto;padding:calc(env(safe-area-inset-top) + 8px) 10px 8px;background:rgba(5,7,12,.92);border-bottom:1px solid rgba(255,255,255,.08);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.bar b{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#7f8aa0;align-self:center;white-space:nowrap;margin-right:2px}
+.bar button{white-space:nowrap;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);border-radius:999px;padding:6px 11px;font-size:12.5px;cursor:pointer}
+.bar button.on{background:rgba(30,144,255,.22);border-color:#1E90FF;color:#fff}
+.pad{padding:18px 18px 110px}
+h1{font-size:24px;margin:4px 0 4px}h2{font-size:19px;margin:18px 0 8px}
+.sub{color:#9aa3b2;font-size:14px;line-height:1.45}
+.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:14px;margin-top:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:18px;padding:15px;font-size:16.5px;font-weight:700;cursor:pointer;color:#fff;
+ background:linear-gradient(145deg,#3aa4ff,#1E78F0);box-shadow:0 0 26px rgba(30,144,255,.4),inset 0 1px 0 rgba(255,255,255,.3)}
+.btn.sec{background:rgba(255,255,255,.06);box-shadow:none;border:1px solid rgba(255,255,255,.2);font-weight:600}
+.btn.white{background:#fff;color:#111;box-shadow:none}
+.btn+.btn{margin-top:10px}
+.row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);margin-top:8px;cursor:pointer;width:100%;text-align:left}
+.row .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(30,144,255,.15);flex:none}
+.row b{display:block;font-size:15.5px}.row small{display:block;color:#9aa3b2;font-size:12.5px;margin-top:2px}
+.row .ar{margin-left:auto;color:#7f8aa0;font-size:20px}
+.row.on{border-color:#1E90FF;background:rgba(30,144,255,.14)}
+.row.lock{opacity:.4;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.chip{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);border-radius:999px;padding:6px 11px;font-size:13px}
+.chip.on{background:rgba(30,144,255,.22);border-color:#1E90FF}
+.k{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:#7fb2ff;font-weight:700;margin:16px 0 4px}
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(145deg,rgba(30,90,200,.45),rgba(30,90,200,.12));border-bottom:1px solid rgba(255,255,255,.12);border-radius:0 0 22px 22px}
+.crest{width:36px;height:40px;background:#fff;color:#0b1220;font-weight:800;display:grid;place-items:center;clip-path:path("M18 1 L35 5 L35 20 C35 30 27 36 18 39 C9 36 1 30 1 20 L1 5 Z")}
+.top b{font-size:18px}.top small{display:block;color:#b9c6e0;font-size:12px}
+.badge{margin-left:auto;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:rgba(52,199,123,.18);color:#5fe0a0}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.tile{padding:14px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.tile i{font-style:normal;font-size:24px}.tile b{display:block;margin-top:6px}.tile small{color:#9aa3b2;font-size:12px}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);width:min(424px,calc(100% - 36px));z-index:15}
+.qr{background:#fff;border-radius:16px;padding:12px;width:190px;height:190px;margin:12px auto;display:grid;grid-template-columns:repeat(21,1fr)}
+.qr span{background:#0b0f14}.qr span.w{background:#fff}
+.code{font-family:ui-monospace,Menlo,monospace;text-align:center;font-size:20px;letter-spacing:.1em;color:#7fb2ff;font-weight:700}
+.wa{background:#0b141a;border-radius:16px;padding:12px;margin-top:10px;border:1px solid rgba(255,255,255,.08)}
+.wa .msg{background:#005c4b;border-radius:12px 12px 2px 12px;padding:10px 12px;font-size:14px;line-height:1.4;margin-left:30px}
+.note{background:rgba(30,144,255,.1);border:1px solid rgba(30,144,255,.3);border-radius:14px;padding:11px 13px;font-size:13.5px;line-height:1.45;margin-top:12px}
+.tree{margin-top:8px;font-size:14px;line-height:1.9}
+.tree div{padding-left:calc(var(--l)*18px)}
+label.f{display:block;font-size:13px;color:#9aa3b2;margin-top:12px}
+label.f input{display:block;width:100%;margin-top:6px;padding:13px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);outline:0}
+.logo{display:block;width:200px;margin:30px auto 6px}
+.ok{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:rgba(52,199,123,.18);color:#5fe0a0;font-size:32px;margin:20px auto 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar" id="bar"></div>
+  <div id="v"></div>
+</div>
+<script>
+const CLUB = 'TSV Musterstadt';
+const ABT = [['⚽','Fußball',['1. Mannschaft','2. Mannschaft','A-Jugend','Bambini']],['🏀','Basketball',['Herren','U16']],['🤸','Turnen',['Kinderturnen','Seniorinnen']]];
+const ROLLEN = {
+  haupt:   {n:'Hauptadmin', d:'Darf alles im Verein', kann:['abt','trainer','mitglied','vereinsqr']},
+  abt:     {n:'Abteilungs-Admin', d:'Verwaltet eine Abteilung', kann:['trainer','mitglied']},
+  trainer: {n:'Trainer', d:'Verwaltet seine Mannschaft', kann:['mitglied']},
+  mitglied:{n:'Mitglied / Spieler', d:'Sieht alles, sagt zu/ab', kann:[]}
+};
+const S = {screen:'start', ich:'haupt', wen:null, abt:'Fußball', team:'1. Mannschaft', weg:null, gast:null};
+const steps = [['start','1 Start'],['app','2 App (Testverein)'],['einladen','3 Einladen'],['gast','4 Eingeladener'],['ideen','Ideen']];
+const $ = id => document.getElementById(id);
+function go(s){ S.screen=s; render(); scrollTo(0,0); }
+function bar(){ $('bar').innerHTML = '<b>Vorschau</b>' + steps.map(([k,l])=>`<button class="${S.screen===k||(k==='einladen'&&S.screen==='geteilt')||(k==='gast'&&S.screen==='drin')?'on':''}" onclick="go('${k}')">${l}</button>`).join(''); }
+function qr(){ let h=''; let seed=7; for(let i=0;i<441;i++){ const r=Math.floor(i/21), c=i%21; const f=(r<7&&c<7)||(r<7&&c>13)||(r>13&&c<7); let dark; if(f){ const rr=r%14>6?r-14:r, cc=c>13?c-14:c; const a=Math.max(Math.abs(rr-3),Math.abs(cc-3)); dark=a!==2; } else { seed=(seed*9301+49297)%233280; dark=seed/233280>.5; } h+=`<span class="${dark?'':'w'}"></span>`; } return `<div class="qr">${h}</div>`; }
+function top(rolle){ return `<div class="top"><span class="crest">T</span><span><b>${CLUB}</b><small>${rolle}</small></span><span class="badge">eingerichtet ✓</span></div>`; }
+
+const V = {
+  start: () => `<div class="pad" style="text-align:center">
+      <img class="logo" src="onbac-logo.png" alt="OrgaMe"><p class="sub">Die All-in-One Vereins-App</p>
+      <div style="height:40px"></div>
+      <button class="btn" onclick="go('gast')">QR-Code scannen</button>
+      <p class="sub" style="margin:14px 0">oder anmelden mit Apple · Google · E-Mail <span class="chip">bald</span></p>
+      <button class="btn sec" onclick="go('app')">🔑 Testzugang</button>
+      <div class="note" style="text-align:left"><b>Neu:</b> Der Testzugang führt <b>direkt in den fertig eingerichteten Testverein</b> – ohne Verein anlegen, ohne Sportarten-Einrichtung. Den Verein legt der Käufer nur auf www.orga.me an.</div>
+    </div>`,
+  app: () => `${top('Du bist: ' + ROLLEN[S.ich].n + (S.ich==='abt'?' · Fußball':S.ich==='trainer'?' · 1. Mannschaft':''))}
+    <div class="pad">
+      <div class="card" style="margin-top:0"><b>Testen als</b><div class="chips">${Object.keys(ROLLEN).map(k=>`<button class="chip ${S.ich===k?'on':''}" onclick="S.ich='${k}';render()">${ROLLEN[k].n}</button>`).join('')}</div>
+      <p class="sub" style="margin-top:8px">Im Testzugang kannst du jede Rolle ausprobieren.</p></div>
+      <h2>Abteilungen</h2>
+      <div class="tiles">${ABT.map(a=>`<div class="tile"><i>${a[0]}</i><b>${a[1]}</b><small>${a[2].length} Mannschaften</small></div>`).join('')}<div class="tile"><i>🏟️</i><b>Belegung</b><small>Plätze & Hallen</small></div></div>
+      <h2>Heute</h2>
+      <div class="row" style="cursor:default"><span class="ic">⚽</span><span><b>Platz 1</b><small>1. Mannschaft · Training</small></span><span class="ar" style="font-size:14px;color:#eef1f6">18:00–20:00</span></div>
+      <div class="row" style="cursor:default"><span class="ic">🏀</span><span><b>Halle 1</b><small>U16 · Training</small></span><span class="ar" style="font-size:14px;color:#eef1f6">17:00–18:30</span></div>
+    </div>
+    ${ROLLEN[S.ich].kann.length ? `<div class="fab"><button class="btn" onclick="S.wen=null;S.weg=null;go('einladen')">➕ Einladen</button></div>` : ''}`,
+  einladen: () => {
+    const r = ROLLEN[S.ich];
+    const opt = [
+      ['vereinsqr','📌','Vereins-QR-Code','Einmal für den Verein – zum Aushängen. Neue Mitglieder wählen ihre Mannschaft, der Abteilungs-Admin bestätigt.'],
+      ['abt','🛡️','Abteilungs-Admin','Bekommt eine ganze Abteilung'],
+      ['trainer','🧢','Trainer','Bekommt eine Mannschaft'],
+      ['mitglied','👤','Mitglied / Spieler','Persönliche Einladung in eine Mannschaft']];
+    const abts = S.ich==='haupt' ? ABT : ABT.filter(a=>a[1]==='Fußball');
+    if (!abts.some(a=>a[1]===S.abt)) S.abt = abts[0][1];
+    const teams = S.ich==='trainer' ? ['1. Mannschaft'] : abts.find(a=>a[1]===S.abt)[2];
+    return `${top('Einladen als ' + r.n)}<div class="pad">
+      <h1>Wen möchtest du einladen?</h1>
+      <p class="sub">Du kannst nur eine Stufe unter dir einladen – und nur in deinem Bereich.</p>
+      ${opt.map(([k,ic,t,d])=>{ const ok=r.kann.includes(k); return `<button class="row ${S.wen===k?'on':''} ${ok?'':'lock'}" ${ok?`onclick="S.wen='${k}';render()"`:''}><span class="ic">${ic}</span><span><b>${t}</b><small>${ok?d:'🔒 Nur ' + (k==='abt'||k==='vereinsqr'?'Hauptadmin':'Abteilungs-Admin oder höher')}</small></span></button>`; }).join('')}
+      ${S.wen && S.wen!=='vereinsqr' ? `
+        ${S.wen!=='trainer'||true ? `<div class="k">Abteilung</div><div class="chips">${abts.map(a=>`<button class="chip ${S.abt===a[1]?'on':''}" onclick="S.abt='${a[1]}';S.team=null;render()">${a[0]} ${a[1]}</button>`).join('')}</div>` : ''}
+        ${S.wen!=='abt' ? `<div class="k">Mannschaft</div><div class="chips">${teams.map(t=>`<button class="chip ${S.team===t?'on':''}" onclick="S.team='${t}';render()">${t}</button>`).join('')}</div>` : ''}
+        <label class="f">Name (optional)<input placeholder="z. B. Max Müller"></label>` : ''}
+      ${S.wen ? `<div class="k">Wie verschicken?</div>
+        <button class="row" onclick="S.weg='qr';go('geteilt')"><span class="ic">▣</span><span><b>QR-Code zeigen</b><small>Vor Ort scannen lassen</small></span><span class="ar">›</span></button>
+        ${S.wen!=='vereinsqr' ? `<button class="row" onclick="S.weg='wa';go('geteilt')"><span class="ic" style="background:rgba(37,211,102,.18)">💬</span><span><b>WhatsApp</b><small>Fertiger Text mit Link</small></span><span class="ar">›</span></button>
+        <button class="row" onclick="S.weg='mail';go('geteilt')"><span class="ic">✉️</span><span><b>E-Mail</b><small>Einladung per Mail</small></span><span class="ar">›</span></button>` : ''}` : ''}
+    </div>`;
+  },
+  geteilt: () => {
+    const was = S.wen==='vereinsqr' ? 'Mitglied (Vereins-QR)' : ROLLEN[S.wen].n + ' · ' + (S.wen==='abt' ? S.abt : (S.team||'Mannschaft wählen'));
+    S.gast = {rolle: S.wen==='vereinsqr' ? 'mitglied' : S.wen, abt:S.abt, team:S.team, von: ROLLEN[S.ich].n};
+    const text = `Hallo! Du bist bei OrgaMe für ${CLUB} eingeladen – als ${was}. Einfach hier tippen: orga.me/e/K7QM-28XP`;
+    return `${top('Einladung erstellt')}<div class="pad">
+      <h1>${S.weg==='qr'?'QR-Code zeigen':S.weg==='wa'?'Per WhatsApp':'Per E-Mail'}</h1>
+      <div class="chips"><span class="chip on">${was}</span></div>
+      ${S.weg==='qr' ? `${qr()}<div class="code">K7QM-28XP</div><p class="sub" style="text-align:center;margin-top:6px">${S.wen==='vereinsqr'?'Bleibt gültig, bis du ihn zurückziehst · zum Ausdrucken':'7 Tage gültig · nur für eine Person'}</p>`
+        : S.weg==='wa' ? `<div class="wa"><div class="msg">${text}</div></div><p class="sub" style="margin-top:8px">WhatsApp öffnet sich mit diesem Text – du wählst nur noch den Kontakt.</p>`
+        : `<label class="f">E-Mail-Adresse<input placeholder="max@beispiel.de"></label><div class="card"><b>Betreff:</b> Einladung zu ${CLUB}<p class="sub" style="margin-top:6px">${text}</p></div>`}
+      <div style="height:16px"></div>
+      <button class="btn" onclick="go('gast')">So sieht es der Eingeladene ›</button>
+      <button class="btn sec" onclick="go('app')">Fertig</button>
+    </div>`;
+  },
+  gast: () => { const g = S.gast || {rolle:'trainer', abt:'Fußball', team:'1. Mannschaft', von:'Hauptadmin'};
+    const was = ROLLEN[g.rolle].n + (g.rolle==='abt' ? ' · ' + g.abt : g.team ? ' · ' + g.team : '');
+    return `<div class="pad"><img class="logo" style="width:150px" src="onbac-logo.png" alt="OrgaMe">
+      <div class="card"><div class="k" style="margin-top:0">Einladung</div><h1>${CLUB}</h1><p class="sub">von Peter Schmidt (${g.von})</p>
+        <div class="k">Deine Rolle</div><div class="chips"><span class="chip on">${was}</span></div>
+        <p class="sub" style="margin-top:10px">Der Verein ist schon eingerichtet – du musst nichts anlegen.</p></div>
+      <label class="f">Dein Name<input value="Max Müller"></label>
+      <div style="height:14px"></div>
+      <button class="btn" onclick="go('drin')">Jetzt beitreten</button>
+      <p class="sub" style="text-align:center;margin-top:10px">Anmelden später mit Apple, Google oder E-Mail – damit das Konto auch bei Handywechsel bleibt.</p></div>`; },
+  drin: () => { const g = S.gast || {rolle:'trainer', abt:'Fußball', team:'1. Mannschaft'};
+    return `${top('Du bist: ' + ROLLEN[g.rolle].n + (g.rolle==='abt'?' · '+g.abt: g.team?' · '+g.team:''))}<div class="pad">
+      <div class="ok">✓</div><h1 style="text-align:center">Willkommen, Max!</h1>
+      <p class="sub" style="text-align:center">Du siehst sofort alles, was dein Admin schon eingerichtet hat.</p>
+      <h2>${g.rolle==='abt'?'Deine Abteilung':'Deine Mannschaft'}</h2>
+      <div class="row" style="cursor:default"><span class="ic">⚽</span><span><b>${g.rolle==='abt'?g.abt:(g.team||'1. Mannschaft')}</b><small>${g.rolle==='abt'?'4 Mannschaften · Plätze & Termine':'Termine · Spieler · Zu- und Absagen'}</small></span></div>
+      <div class="note">${g.rolle==='mitglied'?'Als Mitglied siehst du Termine und Belegung und sagst zu oder ab.':g.rolle==='trainer'?'Als Trainer trägst du Termine für deine Mannschaft ein und lädst Spieler ein.':'Als Abteilungs-Admin verwaltest du Fußball und lädst Trainer und Mitglieder ein.'}</div>
+    </div>`; },
+  ideen: () => `<div class="pad"><h1>Vorschlag</h1>
+    <div class="card"><b>1. Testzugang = fertiger Testverein</b><p class="sub" style="margin-top:6px">Nach dem Code direkt in den Testverein, alles eingerichtet. Kein „Verein anlegen“ und keine Einrichtung in der App. Neue Vereine entstehen nur auf www.orga.me.</p></div>
+    <div class="card"><b>2. Rollen-Treppe statt Häkchen</b><p class="sub" style="margin-top:6px">Jeder lädt nur eine Stufe unter sich ein – und nur in seinem Bereich. Einfacher als einzelne Rechte anzuhaken:</p>
+      <div class="tree"><div style="--l:0">👑 Hauptadmin – ganzer Verein</div><div style="--l:1">🛡️ Abteilungs-Admin – z. B. Fußball</div><div style="--l:2">🧢 Trainer – z. B. 1. Mannschaft</div><div style="--l:3">👤 Mitglied / Spieler</div></div></div>
+    <div class="card"><b>3. Zwei Arten von Einladung</b><p class="sub" style="margin-top:6px"><b>Vereins-QR-Code:</b> einmal pro Verein, zum Aushängen. Wer scannt, wählt seine Mannschaft; der zuständige Admin bestätigt.<br><b>Persönliche Einladung:</b> per QR, WhatsApp oder E-Mail, mit fester Rolle, 7 Tage gültig, nur einmal.</p></div>
+    <div class="card"><b>4. Später: Konto sichern</b><p class="sub" style="margin-top:6px">Nach dem Beitritt einmal mit Apple, Google oder E-Mail verbinden – dann bleibt alles auch nach einem Handywechsel.</p></div>
+    <div style="height:14px"></div><button class="btn" onclick="go('start')">Vorschau von vorn</button></div>`
+};
+function render(){ bar(); $('v').innerHTML = V[S.screen](); }
+render();
+</script>
+</body>
+</html>
