@@ -325,3 +325,13 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 
 **Was offen ist**
 - Neu gestalten: Der Nutzer möchte die Einladung mit Rechten anders aufbauen. Vor dem nächsten Versuch klären, was anders sein soll.
+
+## 19.11.2026 – „Abo wählen“ und „Bezahlen“ aus der App entfernt (Claude, Chat vom 19.11.)
+
+**Letzter Stand:** Vorschau **https://ohne-abo.onbac.pages.dev** (v107, Grundlage Live-Fassung `9f80cdc2`/v106, nur `onbac-einrichtung.js`, `sw.js`, `index.html` geändert). **Noch nicht in Produktion** – das Hochladen nach onbac.pages.dev war in der Sitzung gesperrt und braucht die Freigabe des Nutzers.
+
+**Was geändert wurde** (Wunsch: Abo und Bezahlen gibt es nur auf der Homepage)
+- `getAbo()` liefert in der App immer „komplett“: alle Funktionen frei, keine Abo-Sperren mehr.
+- Der Zwangsschritt „Abo wählen“ → „Bezahlen“ für neue Admins ist entfernt. Danach kommen wie bisher Datenschutz/AGB und die Einrichtung (Sportarten & Plätze).
+- In ⚙️ › Test-Ablauf: Knopf „💳 Abo ansehen / ändern“ entfernt, Hinweistext angepasst. Fertig-Seite der Gründung sagt „Alles ist eingerichtet.“ statt „Abo … ist aktiv“.
+- Der übrige Abo-Code (Auswahl, Bezahlen-Seite) ist noch in der Datei, wird aber nicht mehr aufgerufen.
