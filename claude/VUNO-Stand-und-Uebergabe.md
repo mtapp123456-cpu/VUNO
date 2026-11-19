@@ -314,3 +314,14 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 - Nur in Handygröße im Browser geprüft, noch nicht auf einem echten zweiten Handy. QR-Scan in der App nutzt die Kamera (Android: eingebaut, sonst Zusatz jsQR); alternativ den QR-Code mit der Handy-Kamera scannen.
 - Rechte nachträglich ändern oder entziehen geht noch nicht in der App (nur Mitglied entfernen).
 - Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+
+## 19.11.2026 – Einladung mit Rechten zurückgenommen (Claude, Chat vom 18./19.11.)
+
+**Letzter Stand:** Auf Wunsch des Nutzers rückgängig gemacht („muss man anders gestalten, funktioniert noch nicht ganz gut“).
+- Supabase: `supabase/rueckgaengig_einladung_rechte.sql` ausgeführt. `can_book`, `can_manage_team`, `post_news`, `join_open_club` sind wieder die alten Fassungen; Trigger `orgame_ort`, alle `orgame_*`-Funktionen sowie die Tabellen `member_rights`, `rights_invites`, `orgame_backup_funcs` sind gelöscht. Die Testmitglieder „Max Test“ und „Lisa Test“ (samt anonymen Konten) sind entfernt. Geprüft: 0 orgame-Funktionen, kein Trigger, alte Fassungen aktiv.
+- Live-App unverändert: Produktion `onbac.pages.dev` ist weiter Bereitstellung `9f80cdc2` (v106). Die Version mit Einladung war nie in Produktion.
+- Bei Cloudflare stehen noch die Vorschau-Bereitstellungen `dff8b91b` und `70cbcbd3` (einladung.onbac.pages.dev). Löschen war in der Sitzung gesperrt; der Nutzer kann sie unter onbac › Bereitstellungen löschen. Sie greifen auf Funktionen zu, die es nicht mehr gibt, und funktionieren deshalb nicht mehr.
+- Der Code bleibt zum Nachschlagen im GitHub-Zweig `orgame-einladung` (nicht in `main`).
+
+**Was offen ist**
+- Neu gestalten: Der Nutzer möchte die Einladung mit Rechten anders aufbauen. Vor dem nächsten Versuch klären, was anders sein soll.
