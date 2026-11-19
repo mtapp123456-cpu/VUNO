@@ -335,3 +335,18 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 - Der Zwangsschritt „Abo wählen“ → „Bezahlen“ für neue Admins ist entfernt. Danach kommen wie bisher Datenschutz/AGB und die Einrichtung (Sportarten & Plätze).
 - In ⚙️ › Test-Ablauf: Knopf „💳 Abo ansehen / ändern“ entfernt, Hinweistext angepasst. Fertig-Seite der Gründung sagt „Alles ist eingerichtet.“ statt „Abo … ist aktiv“.
 - Der übrige Abo-Code (Auswahl, Bezahlen-Seite) ist noch in der Datei, wird aber nicht mehr aufgerufen.
+
+## 19.11.2026 – LIVE: neuer Startbildschirm, Abo/Bezahlen entfernt (Claude, Chat vom 19.11.)
+
+**Letzter Stand:** **Live auf onbac.pages.dev**, Bereitstellung `06b33a8e`, Service-Worker-Cache `onbac-v107` (Grundlage `9f80cdc2`/v106). Freigegeben vom Nutzer („kannst du jetzt live schalten“). Rücksprung bei Cloudflare auf `9f80cdc2` möglich.
+
+**Was geändert wurde**
+- Neue Datei `orgame-start.js` (in `index.html` direkt VOR `account.js`): Startbildschirm nach dem schwarzen Ladebildschirm mit Logo, wenn noch kein Testzugang auf dem Gerät gespeichert ist. Oben „+ Verein gründen ↗“ → https://www.orga.me (aktiv). „QR-Code scannen“, „Mit Apple / Google / E-Mail anmelden“ sichtbar mit Hinweis „BALD“, noch ohne Funktion. „🔑 Testzugang (mit Zugangscode)“ führt zur bisherigen Zugangscode-Abfrage. Unten AGB und Datenschutz.
+- `account.js`: in `enterOpen()` vor `onbacZugang()` der Aufruf `window.orgameStart()`.
+- `onbac-einrichtung.js`: keine Abo-Auswahl und kein Bezahlen mehr in der App (Abo nur auf der Webseite). `getAbo()` liefert immer „komplett“, Abo-Knopf in ⚙️ entfernt, Texte angepasst.
+- Quelle des Startbildschirms: `app/vorschau-start.html` und `app/orgame-start.js` im Zweig `orgame-einladung`.
+
+**Was offen ist**
+- QR-Scan und Anmeldung mit Apple/Google/E-Mail sind nur Platzhalter.
+- Vorschau-Bereitstellungen bei Cloudflare (einladung, ohne-abo, startbild, v107) können gelöscht werden.
+- Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
