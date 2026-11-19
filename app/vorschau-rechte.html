@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OrgaMe – Konzept: Rollen, Rechte, Anmeldung</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#05070C;--card:#0B1328;--line:#1C2A4A;--txt:#EAF0FF;--mut:#9AA7C2;--blue:#1E90FF;--gold:#C9A24A;--green:#5BE39A;--red:#FF7A7A;--lila:#A98BFF;--orange:#FFB15C}
+body{background:radial-gradient(1200px 600px at 50% -200px,#0E1A3A,var(--bg));color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 70px}
+.top img{width:130px}
+h1{font-size:23px;margin:12px 0 6px}
+p.sub{color:var(--mut);font-size:14.5px;line-height:1.55;max-width:780px}
+nav{position:sticky;top:0;z-index:9;display:flex;gap:6px;overflow-x:auto;padding:12px 0;margin-top:10px;background:rgba(5,7,12,.92);backdrop-filter:blur(8px)}
+nav button{white-space:nowrap;border:1px solid #22315A;background:#0A1122;color:#BFD3FF;border-radius:999px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+nav button.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 14px rgba(30,144,255,.4)}
+section{display:none;margin-top:10px}section.on{display:block}
+h2{font-size:19px;margin:14px 0 8px}h3{font-size:15px;margin:18px 0 8px;color:#BFD3FF}
+.card{background:rgba(11,19,40,.8);border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
+.muted{color:var(--mut)}small{font-size:12.5px}
+p{line-height:1.55;font-size:14.5px}
+ul.l{margin:6px 0 0 18px;line-height:1.6;font-size:14px}
+/* Hierarchie */
+.tree{display:flex;flex-direction:column;align-items:center;gap:0}
+.lvl{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.node{min-width:170px;max-width:230px;border-radius:18px;padding:12px 14px;background:#0F1729;border:1.5px solid var(--c,#22315A);box-shadow:0 0 16px color-mix(in srgb,var(--c,#22315A) 35%,transparent);cursor:pointer;text-align:center}
+.node b{display:block;font-size:15px}.node small{color:var(--mut)}
+.node.on{background:color-mix(in srgb,var(--c) 18%,#0F1729)}
+.vline{width:2px;height:22px;background:linear-gradient(var(--blue),#22315A)}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid #22315A;margin:2px}
+.pill.y{border-color:#1F6B47;color:#7FE0AE;background:#0B2219}
+.pill.n{color:#5d6883;text-decoration:line-through}
+.pill.g{border-color:#6B5A1F;color:#F2D58A;background:#221B0B}
+.detail{margin-top:14px}
+.scope{display:inline-block;font-size:12px;padding:3px 9px;border-radius:8px;background:#13285A;color:#BFD3FF;margin-left:6px}
+/* Anmeldung */
+.meth{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px}
+.mcard{border-radius:18px;padding:14px;background:#0F1729;border:1.5px solid #22315A;cursor:pointer;position:relative}
+.mcard.on{border-color:var(--blue);box-shadow:0 0 14px rgba(30,144,255,.35)}
+.mcard b{display:flex;align-items:center;gap:8px;font-size:15px}
+.mcard p{font-size:13px;color:var(--mut);margin-top:6px}
+.chk{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:7px;border:2px solid #3A4766;display:grid;place-items:center;font-size:13px}
+.mcard.on .chk{background:var(--blue);border-color:var(--blue)}
+.ic{width:34px;height:34px;border-radius:10px;display:inline-grid;place-items:center;border:1.5px solid rgba(201,162,74,.8);box-shadow:0 0 8px rgba(201,162,74,.25)}
+.ic svg{width:18px;height:18px}
+/* Ablauf */
+.flow{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.st{display:grid;grid-template-columns:42px 1fr;gap:12px;position:relative;padding-bottom:16px}
+.st:not(:last-child)::before{content:"";position:absolute;left:20px;top:42px;bottom:0;width:2px;background:#22315A}
+.num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:#0F1729;border:2px solid var(--blue);box-shadow:0 0 12px rgba(30,144,255,.35)}
+.st b{font-size:15px}.st p{font-size:13.5px;color:var(--mut);margin-top:3px}
+.act{margin-top:6px;font-size:12.5px;border-radius:10px;padding:7px 10px;background:#0B2219;border:1px solid #1F6B47;color:#9BF0C4}
+.act.w{background:#221B0B;border-color:#6B5A1F;color:#F2D58A}
+.act.n{background:#1A0F14;border-color:#5A2232;color:#FFB0B0}
+.sel{display:flex;gap:6px;flex-wrap:wrap}
+.sel button{border:1.5px solid #22315A;background:#0A1122;color:var(--txt);border-radius:12px;padding:9px 12px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.sel button.on{border-color:var(--blue);box-shadow:0 0 12px rgba(30,144,255,.35)}
+/* Zeitleiste */
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;margin-top:8px}
+th,td{padding:9px 8px;border-bottom:1px solid #18233F;text-align:left;vertical-align:top}
+th{color:#BFD3FF;font-size:12.5px;position:sticky;top:0;background:#0B1328}
+td.c{text-align:center}
+.tw{overflow-x:auto;border-radius:16px;border:1px solid var(--line)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%}
+.d1{background:#5BE39A}.d2{background:#FFB15C}.d3{background:#3A4766}
+/* Datenmodell */
+.er{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:10px}
+.tb{border-radius:16px;background:#0A1122;border:1.5px solid var(--c);overflow:hidden}
+.tb h4{font-size:13.5px;padding:9px 12px;background:color-mix(in srgb,var(--c) 22%,#0A1122);display:flex;justify-content:space-between;align-items:center}
+.tb h4 em{font-style:normal;font-size:11px;color:var(--mut);font-weight:600}
+.tb div{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:3px 12px;color:#CFDAF5;border-top:1px solid #121B33}
+.tb div.k{color:#F2D58A}.tb div.f{color:#9FC7FF}
+.tb div span{color:#6E7A96;float:right}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+pre{margin-top:10px;background:#03050A;border:1px solid var(--line);border-radius:14px;padding:14px;overflow:auto;font-size:12px;line-height:1.5;color:#CFDAF5}
+.calc{display:grid;gap:8px;margin-top:8px}
+.formula{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:#03050A;border:1px solid var(--line);border-radius:12px;padding:12px;line-height:1.7}
+.foot{margin-top:30px;text-align:center;font-size:12.5px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><img src="onbac-logo.png" alt="OrgaMe"></div>
+  <h1>Konzept: Rollen, Rechte und Anmeldung</h1>
+  <p class="sub">Vorschau für die neue Verwaltung von OrgaMe: Hierarchie vom Haupt-Admin bis zum Spieler, Anmeldung per E-Mail, SMS oder QR-Code nach Wahl des Vereins, Einladungen Schritt für Schritt – und ein Datenmodell, in dem Rollen und Rechte getrennt gespeichert sind, damit neue Module ohne Umbau dazukommen.</p>
+
+  <nav id="nav">
+    <button data-t="hier" class="on">1 · Hierarchie</button>
+    <button data-t="login">2 · Anmeldung</button>
+    <button data-t="flow">3 · Einladung</button>
+    <button data-t="time">4 · Wann gilt welches Recht?</button>
+    <button data-t="data">5 · Datenmodell</button>
+  </nav>
+
+  <!-- 1 Hierarchie -->
+  <section id="hier" class="on">
+    <h2>Hierarchie – antippen für Details</h2>
+    <div class="card">
+      <div class="tree" id="tree"></div>
+      <div class="detail" id="detail"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Grundregeln</h3>
+      <ul class="l">
+        <li><b>Nach unten weitergeben, nie nach oben:</b> Jeder kann nur Rechte vergeben, die er selbst in diesem Bereich hat.</li>
+        <li><b>Bereich (Scope):</b> Rechte gelten immer für einen Bereich – ganzer Verein, eine Abteilung oder eine Mannschaft. Ein Trainer der C-Jugend sieht die A-Jugend nicht als Verwalter.</li>
+        <li><b>Höchstens 4 Haupt-Admins:</b> der erste plus bis zu drei weitere – die Datenbank lässt keinen fünften zu.</li>
+        <li><b>Spieler haben nach der Anmeldung zunächst keine Rechte</b>, bis jemand darüber sie freischaltet.</li>
+        <li><b>Mehrere Rollen möglich:</b> Wer Abteilungs-Admin Fußball und Spieler in der AH ist, hat zwei Einträge – die Rechte werden zusammengezählt.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2 Anmeldung -->
+  <section id="login">
+    <h2>Anmeldesystem</h2>
+    <div class="card">
+      <h3 style="margin-top:0">Der Verein wählt die Anmeldewege (Einstellung des Haupt-Admins)</h3>
+      <div class="meth" id="meth"></div>
+      <p class="muted" style="margin-top:10px;font-size:13px" id="methnote"></p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">So funktioniert jede Anmeldung</h3>
+      <ul class="l">
+        <li><b>Kein Passwort.</b> Ein Konto ist eine bestätigte E-Mail-Adresse oder Handynummer. Jede Anmeldung wird mit einem 6-stelligen Einmal-Code bestätigt (10 Minuten gültig, 5 Versuche).</li>
+        <li><b>QR-Code ist kein Ausweis, sondern die Eintrittskarte.</b> Er sagt: „Du darfst in diesen Verein, diese Abteilung oder Mannschaft.“ Wer ihn scannt, bestätigt danach trotzdem E-Mail oder Handynummer – je nachdem, was der Verein erlaubt.</li>
+        <li><b>Haupt-Admin:</b> Der erste Haupt-Admin entsteht bei der Vereinsgründung auf www.orga.me (oder in der App über „Verein gründen“). Er meldet sich per E-Mail-Code an – dieser Weg ist für Haupt-Admins immer erlaubt, damit niemand ausgesperrt wird.</li>
+        <li><b>Gerät merken:</b> Nach der Anmeldung bleibt man auf dem Handy angemeldet. Abmelden auf allen Geräten kann jeder selbst; Admins können ein Mitglied sperren – dann endet jede Sitzung sofort.</li>
+        <li><b>Später zusätzlich:</b> Anmelden mit Apple oder Google, verknüpft mit derselben E-Mail.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3 Einladung -->
+  <section id="flow">
+    <h2>Einladungsablauf Schritt für Schritt</h2>
+    <div class="sel" id="flowsel"></div>
+    <div class="card"><div class="flow" id="flowlist"></div></div>
+  </section>
+
+  <!-- 4 Zeitpunkt -->
+  <section id="time">
+    <h2>Wann wird welches Recht aktiv?</h2>
+    <p class="muted" style="font-size:13.5px">Zustand eines Mitglieds im Verein – Rechte gelten erst ab der markierten Stufe.</p>
+    <div class="legend"><span><i class="d1" style="background:#5BE39A"></i>aktiv</span><span><i style="background:#FFB15C"></i>nur nach Freigabe/Vergabe</span><span><i style="background:#3A4766"></i>nie in dieser Rolle</span></div>
+    <div class="card">
+      <h3 style="margin-top:0">Die Stufen</h3>
+      <div class="flow" id="states"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Rechte-Übersicht nach Rolle</h3>
+      <div class="tw"><table id="matrix"></table></div>
+    </div>
+  </section>
+
+  <!-- 5 Daten -->
+  <section id="data">
+    <h2>Datenkonzept – Rollen und Rechte getrennt</h2>
+    <div class="legend">
+      <span><i style="background:#1E90FF"></i>Verein &amp; Struktur</span>
+      <span><i style="background:#A98BFF"></i>Rollen</span>
+      <span><i style="background:#C9A24A"></i>Rechte &amp; Module</span>
+      <span><i style="background:#5BE39A"></i>Mitglieder &amp; Zuweisungen</span>
+      <span><i style="background:#FFB15C"></i>Einladung &amp; Anmeldung</span>
+    </div>
+    <div class="er" id="er"></div>
+    <div class="card">
+      <h3 style="margin-top:0">Wie die App ein Recht prüft</h3>
+      <div class="formula">darf(Person, Recht, Bereich) =<br>
+        &nbsp;&nbsp;Mitglied ist <b>freigegeben</b> und nicht gesperrt<br>
+        &nbsp;&nbsp;UND ( Rolle im Bereich oder darüber hat das Recht <span class="muted">→ role_permissions</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ODER Recht wurde einzeln vergeben <span class="muted">→ member_permissions</span> )<br>
+        &nbsp;&nbsp;UND nicht einzeln entzogen</div>
+      <ul class="l">
+        <li><b>Bereich nach oben:</b> Ein Recht auf Abteilung „Fußball“ gilt auch in allen Mannschaften darunter; ein Vereinsrecht überall.</li>
+        <li><b>Vergabe-Grenze:</b> Beim Speichern in <code>member_permissions</code> prüft die Datenbank, dass der Vergebende das Recht im selben oder einem höheren Bereich selbst hat <i>und</i> es weitergeben darf.</li>
+        <li><b>Neues Modul</b> (z. B. Kasse, Shop, Trikotverwaltung): Eintrag in <code>modules</code> + seine Rechte in <code>permissions</code> + Vorgaben in <code>role_permissions</code>. Keine Änderung an Rollen, Mitgliedern oder Einladungen.</li>
+        <li><b>Protokoll:</b> Jede Vergabe, Freigabe und Sperre landet in <code>audit_log</code> (wer, wem, was, wann).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Tabellen als SQL (Entwurf für Supabase)</h3>
+      <pre id="sql"></pre>
+    </div>
+  </section>
+
+  <div class="foot">Konzept-Vorschau – noch nicht in der App. Stand 19.11.2026.</div>
+</div>
+
+<script>
+const SV = p => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+const I = {
+  mail: SV('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>'),
+  sms: SV('<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>'),
+  qr: SV('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-4M14 18v3"/>')
+};
+const $ = s => document.querySelector(s);
+
+/* ---------- Rechte-Katalog (Modul.Recht) ---------- */
+const P = [
+  ['verein.verwalten','Verein','Vereinsdaten, Wappen, Farben, Anmeldewege'],
+  ['verein.hauptadmin_einladen','Verein','weitere Haupt-Admins einladen (max. 3)'],
+  ['abteilung.anlegen','Struktur','Abteilungen anlegen und löschen'],
+  ['abteilung.admin_ernennen','Struktur','Abteilungs-Admins einladen/ernennen'],
+  ['mannschaft.anlegen','Struktur','Mannschaften anlegen'],
+  ['trainer.ernennen','Struktur','Trainer einladen/ernennen'],
+  ['mannschaft.verwalten','Mannschaft','Kader, Termine, Aufstellung'],
+  ['spieler.einladen','Mitglieder','Spieler einladen (Link, QR, SMS)'],
+  ['spieler.freischalten','Mitglieder','Spieler freigeben oder sperren'],
+  ['rechte.vergeben','Mitglieder','einzelne Rechte an Spieler geben'],
+  ['kalender.bearbeiten','Kalender','Termine anlegen und ändern'],
+  ['kalender.ansehen','Kalender','Termine sehen, zu- und absagen'],
+  ['anlage.buchen','Anlagen','Plätze, Hallen, Sportheim buchen'],
+  ['news.posten','Kommunikation','Breaking News / Nachrichten posten'],
+  ['fahrgruppe.erstellen','Kommunikation','Fahrgemeinschaft anlegen']
+];
+/* Vorgaben je Rolle: 1 = aktiv, 2 = nur nach Vergabe, 0 = nie */
+const ROLES = [
+  {k:'hauptadmin', n:'Haupt-Admin', c:'#1E90FF', scope:'ganzer Verein', who:'max. 4 je Verein · über App oder Website',
+   r:[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]},
+  {k:'abteilungsadmin', n:'Abteilungs-Admin', c:'#A98BFF', scope:'eine Abteilung', who:'ernannt von einem Haupt-Admin',
+   r:[0,0,0,0,1,1,1,1,1,1,1,1,1,1,1]},
+  {k:'trainer', n:'Trainer', c:'#C9A24A', scope:'eine Mannschaft', who:'ernannt vom Abteilungs-Admin',
+   r:[0,0,0,0,0,0,1,1,1,1,1,1,1,1,1]},
+  {k:'spieler', n:'Spieler', c:'#5BE39A', scope:'eine Mannschaft', who:'eingeladen von Trainer oder darüber',
+   r:[0,0,0,0,0,0,0,0,0,0,2,1,2,2,2]}
+];
+
+/* ---------- 1 Hierarchie ---------- */
+let selRole = 0;
+function tree() {
+  const n = (i, extra) => { const R = ROLES[i]; return `<div class="node ${i === selRole ? 'on' : ''}" style="--c:${R.c}" data-r="${i}"><b>${R.n}${extra || ''}</b><small>${R.scope}</small></div>`; };
+  $('#tree').innerHTML =
+    `<div class="lvl">${n(0, ' ×1')}<div class="node" style="--c:#1E90FF;opacity:.55;cursor:default"><b>+ bis zu 3 weitere</b><small>gleiche Rechte</small></div></div><div class="vline"></div>
+     <div class="lvl">${n(1)}<div class="node" style="--c:#A98BFF;opacity:.55;cursor:default"><b>je Abteilung</b><small>Fußball, Turnen, …</small></div></div><div class="vline"></div>
+     <div class="lvl">${n(2)}<div class="node" style="--c:#C9A24A;opacity:.55;cursor:default"><b>je Mannschaft</b><small>Erste, C-Jugend, …</small></div></div><div class="vline"></div>
+     <div class="lvl">${n(3)}</div>`;
+  const R = ROLES[selRole];
+  const txt = [
+    'Meldet sich über die App oder www.orga.me an und hat alle Vereinsrechte. Legt die Abteilungen an, ernennt Abteilungs-Admins und darf bis zu drei weitere Haupt-Admins einladen (dann zusammen höchstens vier).',
+    'Verwaltet nur seine Abteilung: legt Mannschaften an und ernennt die Trainer. Sieht andere Abteilungen nur wie ein normales Mitglied.',
+    'Verwaltet nur seine Mannschaft: Kader, Termine, Aufstellung. Lädt Spieler ein, schaltet sie frei und gibt ihnen einzelne Rechte – aber nur Rechte, die er selbst hat.',
+    'Hat nach der Anmeldung zunächst keine Rechte („wartet auf Freigabe“). Nach der Freigabe durch den Trainer: Termine sehen und zu- oder absagen. Alles Weitere (z. B. Fahrgemeinschaft erstellen, Platz buchen) nur, wenn es ihm einzeln gegeben wird.'
+  ][selRole];
+  $('#detail').innerHTML = `<h3 style="margin-top:4px">${R.n}<span class="scope">Bereich: ${R.scope}</span></h3><p class="muted" style="font-size:13.5px">${R.who}</p><p style="margin-top:6px">${txt}</p>
+    <div style="margin-top:10px">${P.map((p, i) => `<span class="pill ${R.r[i] === 1 ? 'y' : R.r[i] === 2 ? 'g' : 'n'}" title="${p[2]}">${p[0]}</span>`).join('')}</div>
+    <p class="muted" style="font-size:12.5px;margin-top:6px">Grün = hat die Rolle sofort · Gold = nur wenn einzeln vergeben · durchgestrichen = nie</p>`;
+}
+
+/* ---------- 2 Anmeldung ---------- */
+const M = [
+  {k:'email', n:'E-Mail-Code', i:I.mail, d:'Adresse eingeben → 6-stelliger Code per E-Mail → fertig. Kostenlos, Standard.', on:true},
+  {k:'sms', n:'SMS-Code', i:I.sms, d:'Handynummer eingeben → Code per SMS. Gut für Spieler ohne E-Mail; kostet pro SMS ein paar Cent.', on:false},
+  {k:'qr', n:'QR-Code vor Ort', i:I.qr, d:'Plakat in der Kabine oder am Sportheim scannen → Verein/Mannschaft vorausgewählt → dann E-Mail- oder SMS-Code.', on:true}
+];
+function meth() {
+  $('#meth').innerHTML = M.map((m, i) => `<div class="mcard ${m.on ? 'on' : ''}" data-m="${i}"><span class="chk">${m.on ? '✓' : ''}</span><b><span class="ic">${m.i}</span>${m.n}</b><p>${m.d}</p></div>`).join('');
+  const on = M.filter(m => m.on).map(m => m.n);
+  const id = M.filter(m => m.on && m.k !== 'qr');
+  $('#methnote').innerHTML = id.length ? `Dieser Verein erlaubt: <b>${on.join(', ')}</b>. Die App zeigt nur diese Wege an.` : '<span style="color:#FF7A7A">Mindestens E-Mail oder SMS muss an sein – der QR-Code allein bestätigt keine Person.</span>';
+}
+
+/* ---------- 3 Einladung ---------- */
+const FLOWS = [
+  {n:'Haupt-Admin gründet', steps:[
+    ['Verein gründen','Auf www.orga.me oder in der App „Verein gründen“: Vereinsdaten, Kategorie, Abteilungen, Anlagen, Abo (Schritte 1–6, nur hier).',null],
+    ['E-Mail bestätigen','Code an die E-Mail-Adresse. Das Konto entsteht.',null],
+    ['Haupt-Admin aktiv','Eintrag in memberships mit Rolle hauptadmin, Bereich = Verein, Status freigegeben.',['Alle Vereinsrechte sofort aktiv','a']],
+    ['Anmeldewege festlegen','Einstellungen → Anmeldung: E-Mail, SMS, QR an/aus.',null]]},
+  {n:'Haupt-Admin → weiterer Haupt-Admin', steps:[
+    ['Einladung erstellen','Mitglieder → „Haupt-Admin einladen“. Die App zeigt „noch 2 von 3 frei“. Bei 4 Haupt-Admins ist der Knopf gesperrt.',null],
+    ['Versenden','Persönlicher Link per E-Mail oder SMS (kein offener QR-Code für Haupt-Admins), 7 Tage gültig, einmal nutzbar.',null],
+    ['Annehmen & bestätigen','Link öffnen → fertigen Verein sehen → E-Mail-Code bestätigen. Keine Einrichtungsschritte.',null],
+    ['Aktiv','Rolle hauptadmin, Status freigegeben – die Einladung eines Haupt-Admins ist die Freigabe.',['Alle Vereinsrechte ab Code-Bestätigung','a']]]},
+  {n:'Haupt-Admin → Abteilungs-Admin', steps:[
+    ['Abteilung wählen','Abteilung „Fußball“ → „Abteilungs-Admin einladen“.',null],
+    ['Versenden','Persönlicher Link per E-Mail/SMS, oder bestehendes Mitglied direkt ernennen.',null],
+    ['Annehmen & bestätigen','Code bestätigen – Abteilung, Mannschaften und Anlagen sind schon da.',null],
+    ['Aktiv','Rolle abteilungsadmin, Bereich = Fußball.',['Abteilungsrechte ab Code-Bestätigung, nur für Fußball','a']]]},
+  {n:'Abteilungs-Admin → Trainer', steps:[
+    ['Mannschaft anlegen','Abteilungs-Admin legt z. B. „C-Jugend“ an.',null],
+    ['Trainer einladen','In der Mannschaft „Trainer einladen“: Link per E-Mail/SMS oder Mitglied ernennen.',null],
+    ['Annehmen & bestätigen','Code bestätigen.',null],
+    ['Aktiv','Rolle trainer, Bereich = C-Jugend.',['Mannschaftsrechte ab Code-Bestätigung, nur C-Jugend','a']]]},
+  {n:'Trainer → Spieler', steps:[
+    ['Einladen','Trainer: „Spieler einladen“ → Mannschafts-QR (Kabine), WhatsApp-Link, E-Mail oder SMS. QR/Link kann von vielen genutzt werden, z. B. 30 Tage gültig.',null],
+    ['Anmelden','Spieler scannt/öffnet → sieht TSV · C-Jugend → bestätigt E-Mail- oder SMS-Code (je nach Verein).',null],
+    ['Wartet auf Freigabe','Status wartet. Der Spieler sieht nur: „Dein Trainer gibt dich gleich frei.“',['Noch keine Rechte – nur Vereinsname und Mannschaft','n']],
+    ['Trainer gibt frei','Trainer bekommt eine Meldung → „Freigeben“ (oder ablehnen).',['Ab Freigabe: Termine sehen, zu-/absagen, Mannschafts-Chat lesen','a']],
+    ['Einzelne Rechte','Optional gibt der Trainer z. B. „Fahrgemeinschaft erstellen“ oder „Platz buchen“ – nur Rechte, die er selbst hat.',['Zusatzrechte ab Vergabe, jederzeit entziehbar','w']]]}
+];
+let selFlow = 4;
+function flow() {
+  $('#flowsel').innerHTML = FLOWS.map((f, i) => `<button class="${i === selFlow ? 'on' : ''}" data-f="${i}">${f.n}</button>`).join('');
+  $('#flowlist').innerHTML = FLOWS[selFlow].steps.map((s, i) => `<div class="st"><div class="num">${i + 1}</div><div><b>${s[0]}</b><p>${s[1]}</p>${s[2] ? `<div class="act ${s[2][1] === 'n' ? 'n' : s[2][1] === 'w' ? 'w' : ''}">${s[2][1] === 'n' ? '⏸' : s[2][1] === 'w' ? '＋' : '✓'} ${s[2][0]}</div>` : ''}</div></div>`).join('');
+}
+
+/* ---------- 4 Zeit ---------- */
+const STATES = [
+  ['eingeladen','Einladung erstellt, noch nicht angenommen.','Keine Rechte. Einladung kann zurückgezogen werden.','n'],
+  ['bestätigt','Person hat E-Mail-/SMS-Code bestätigt.','Admins und Trainer: sofort aktiv (die Einladung von oben ist die Freigabe). Spieler: weiter „wartet“.','a'],
+  ['freigegeben','Trainer oder darüber hat den Spieler freigeschaltet.','Grundrechte der Rolle aktiv (Spieler: Termine sehen und zusagen).','a'],
+  ['zusätzlich vergeben','Einzelne Rechte über member_permissions.','Ab Vergabe aktiv, mit optionalem Ablaufdatum.','w'],
+  ['gesperrt / entfernt','Admin oder Trainer sperrt oder entfernt.','Alle Rechte sofort weg, Sitzungen beendet. Vergebene Rechte des Gesperrten an andere bleiben erhalten.','n']
+];
+function time() {
+  $('#states').innerHTML = STATES.map((s, i) => `<div class="st"><div class="num">${i + 1}</div><div><b>${s[0]}</b><p>${s[1]}</p><div class="act ${s[3] === 'n' ? 'n' : s[3] === 'w' ? 'w' : ''}">${s[2]}</div></div></div>`).join('');
+  $('#matrix').innerHTML = `<tr><th>Recht</th><th>Modul</th>${ROLES.map(r => `<th class="c" style="color:${r.c}">${r.n}</th>`).join('')}</tr>` +
+    P.map((p, i) => `<tr><td><b>${p[0]}</b><br><small class="muted">${p[2]}</small></td><td>${p[1]}</td>${ROLES.map(r => `<td class="c"><span class="dot d${r.r[i] === 1 ? 1 : r.r[i] === 2 ? 2 : 3}"></span></td>`).join('')}</tr>`).join('');
+}
+
+/* ---------- 5 Daten ---------- */
+const T = [
+  ['clubs','#1E90FF','Verein',[['id','uuid','k'],['name','text'],['wappen_url','text'],['farbe','text'],['abo','text']]],
+  ['club_login_methods','#FFB15C','Anmeldewege je Verein',[['club_id','→ clubs','f'],['methode','email | sms | qr'],['aktiv','bool']]],
+  ['departments','#1E90FF','Abteilungen',[['id','uuid','k'],['club_id','→ clubs','f'],['name','text'],['symbol','text']]],
+  ['teams','#1E90FF','Mannschaften',[['id','uuid','k'],['department_id','→ departments','f'],['name','text']]],
+  ['roles','#A98BFF','nur Rollen, keine Rechte',[['key','text','k'],['name','text'],['stufe','1–4'],['bereich','verein | abteilung | mannschaft'],['max_je_verein','int (Haupt-Admin: 4)']]],
+  ['modules','#C9A24A','Module der App',[['key','text','k'],['name','text'],['aktiv','bool']]],
+  ['permissions','#C9A24A','nur Rechte, keine Rollen',[['key','text','k'],['module_key','→ modules','f'],['beschreibung','text'],['weitergebbar','bool']]],
+  ['role_permissions','#C9A24A','Vorgaben: Rolle ↔ Recht',[['role_key','→ roles','f'],['permission_key','→ permissions','f'],['art','standard | vergebbar']]],
+  ['profiles','#5BE39A','Person (Konto)',[['id','= auth.users','k'],['name','text'],['email','text'],['telefon','text']]],
+  ['memberships','#5BE39A','Person hat Rolle in Bereich',[['id','uuid','k'],['user_id','→ profiles','f'],['club_id','→ clubs','f'],['role_key','→ roles','f'],['department_id','→ departments (opt.)','f'],['team_id','→ teams (opt.)','f'],['status','eingeladen | wartet | freigegeben | gesperrt'],['freigegeben_von','→ profiles','f']]],
+  ['member_permissions','#5BE39A','einzeln vergebene Rechte',[['membership_id','→ memberships','f'],['permission_key','→ permissions','f'],['erlaubt','bool (false = entzogen)'],['vergeben_von','→ profiles','f'],['gueltig_bis','timestamptz']]],
+  ['invitations','#FFB15C','Einladungen',[['code','text','k'],['club_id','→ clubs','f'],['role_key','→ roles','f'],['department_id / team_id','Bereich','f'],['kanal','email | sms | qr | link'],['empfaenger','E-Mail/Tel. (opt.)'],['rechte','text[] Vorauswahl'],['max_nutzungen','int'],['gueltig_bis','timestamptz'],['eingeladen_von','→ profiles','f']]],
+  ['audit_log','#FFB15C','Protokoll',[['wer','→ profiles','f'],['aktion','text'],['ziel','uuid'],['wann','timestamptz']]]
+];
+function data() {
+  $('#er').innerHTML = T.map(([n, c, d, cols]) => `<div class="tb" style="--c:${c}"><h4>${n}<em>${d}</em></h4>${cols.map(([a, b, k]) => `<div class="${k || ''}">${k === 'k' ? '🔑 ' : ''}${a}<span>${b}</span></div>`).join('')}</div>`).join('');
+  $('#sql').textContent = `-- Rollen: nur die Stufen, keine Rechte
+create table roles (
+  key text primary key,                 -- hauptadmin | abteilungsadmin | trainer | spieler
+  name text not null,
+  stufe int not null,                   -- 1 = oben
+  bereich text not null check (bereich in ('verein','abteilung','mannschaft')),
+  max_je_verein int                     -- hauptadmin: 4
+);
+
+-- Module und Rechte: neue Module = neue Zeilen, kein Umbau
+create table modules (key text primary key, name text not null, aktiv boolean default true);
+create table permissions (
+  key text primary key,                 -- z. B. 'kalender.bearbeiten'
+  module_key text not null references modules,
+  beschreibung text,
+  weitergebbar boolean default true
+);
+
+-- Vorgaben: welche Rolle welches Recht hat (standard) oder bekommen darf (vergebbar)
+create table role_permissions (
+  role_key text references roles,
+  permission_key text references permissions,
+  art text not null check (art in ('standard','vergebbar')),
+  primary key (role_key, permission_key)
+);
+
+-- Wer hat welche Rolle in welchem Bereich
+create table memberships (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users,
+  club_id uuid not null references clubs,
+  role_key text not null references roles,
+  department_id uuid references departments,
+  team_id uuid references teams,
+  status text not null default 'wartet'
+    check (status in ('eingeladen','wartet','freigegeben','gesperrt')),
+  freigegeben_von uuid references auth.users,
+  freigegeben_am timestamptz,
+  unique (user_id, club_id, role_key, department_id, team_id)
+);
+
+-- Einzelne Rechte (Spieler-Freigaben von oben), auch Entzug
+create table member_permissions (
+  membership_id uuid references memberships on delete cascade,
+  permission_key text references permissions,
+  erlaubt boolean not null default true,
+  vergeben_von uuid not null references auth.users,
+  gueltig_bis timestamptz,
+  primary key (membership_id, permission_key)
+);
+
+-- Einladungen tragen Rolle, Bereich und Vorauswahl an Rechten
+create table invitations (
+  code text primary key,
+  club_id uuid not null references clubs,
+  role_key text not null references roles,
+  department_id uuid references departments,
+  team_id uuid references teams,
+  kanal text check (kanal in ('email','sms','qr','link')),
+  empfaenger text,
+  rechte text[] default '{}',
+  max_nutzungen int, nutzungen int default 0,
+  gueltig_bis timestamptz,
+  eingeladen_von uuid not null references auth.users,
+  zurueckgezogen_am timestamptz
+);
+
+create table club_login_methods (
+  club_id uuid references clubs,
+  methode text check (methode in ('email','sms','qr')),
+  aktiv boolean default true,
+  primary key (club_id, methode)
+);
+
+-- Prüfung, die jede Tabelle in ihren Zugriffsregeln (RLS) nutzt
+-- has_permission(uid, 'kalender.bearbeiten', club, abteilung, mannschaft) -> boolean
+-- Trigger: höchstens 4 Haupt-Admins je Verein
+-- Trigger: member_permissions nur, wenn vergeben_von das Recht selbst hat (gleicher/höherer Bereich)`;
+}
+
+/* ---------- Steuerung ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-t]'); if (t) { document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b === t)); document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === t.dataset.t)); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+  const r = e.target.closest('[data-r]'); if (r) { selRole = +r.dataset.r; tree(); return; }
+  const m = e.target.closest('[data-m]'); if (m) { M[+m.dataset.m].on = !M[+m.dataset.m].on; meth(); return; }
+  const f = e.target.closest('[data-f]'); if (f) { selFlow = +f.dataset.f; flow(); }
+});
+tree(); meth(); flow(); time(); data();
+</script>
+</body>
+</html>
