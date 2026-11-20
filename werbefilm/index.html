@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OrgaMe Werbefilm – Schnitt</title>
+<style>
+body{margin:0;background:#05070c;color:#eaf0ff;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:20px}
+#log{white-space:pre-wrap;font:12px/1.4 ui-monospace,Menlo,monospace;color:#9fb3c8;max-height:50vh;overflow:auto;background:#0b1328;border-radius:12px;padding:12px;margin-top:12px}
+video{max-height:70vh;border-radius:14px;display:block;margin-top:14px;background:#000}
+</style>
+</head>
+<body>
+<h1 style="font-size:20px;margin:0">OrgaMe Werbefilm – Schnitt im Browser</h1>
+<p id="st">Bereit.</p>
+<div id="log"></div>
+<script type="module">
+import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+import { toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
+
+const log = (t) => { const l = document.getElementById('log'); l.textContent += t + '\n'; l.scrollTop = l.scrollHeight; };
+const st = (t) => { document.getElementById('st').textContent = t; window.__status = t; };
+
+// Text-Ebene für den Abschluss (1080x1920, transparent), gezeichnet im Browser
+async function textPng() {
+  const f = new FontFace('Inter', 'url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-700-normal.woff2)', { weight: '700' });
+  const f2 = new FontFace('Inter', 'url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-500-normal.woff2)', { weight: '500' });
+  try { document.fonts.add(await f.load()); document.fonts.add(await f2.load()); } catch (e) { log('Schrift-Fallback: ' + e); }
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920;
+  const g = c.getContext('2d');
+  g.textAlign = 'center';
+  g.shadowColor = 'rgba(57,255,140,.55)'; g.shadowBlur = 28;
+  g.fillStyle = '#ffffff';
+  g.font = '700 74px Inter, Arial, sans-serif';
+  g.fillText('Weniger organisieren.', 540, 1430);
+  g.fillText('Mehr Vereinsleben.', 540, 1525);
+  g.shadowBlur = 0;
+  g.fillStyle = '#3dffa0';
+  g.fillRect(440, 1580, 200, 4);
+  g.fillStyle = '#c9d6f2';
+  g.font = '500 44px Inter, Arial, sans-serif';
+  g.fillText('orga.me – Vereinsorganisation einfach gemacht.', 540, 1665);
+  const b = await new Promise((r) => c.toBlob(r, 'image/png'));
+  return new Uint8Array(await b.arrayBuffer());
+}
+
+window.schneiden = async (plan) => {
+  // plan: { clips: [{name,url}], segs: [{clip, ss, t}], text: {clip, start}, crf, preset }
+  const ff = new FFmpeg();
+  ff.on('log', ({ message }) => { if (/frame=|error|Error|Invalid/i.test(message)) log(message); });
+  ff.on('progress', ({ progress, time }) => st('Kodiere … ' + Math.round(progress * 100) + ' %'));
+  st('Lade ffmpeg …');
+  const base = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+  await ff.load({
+    classWorkerURL: new URL('ff/worker.js', location.href).href,
+    coreURL: await toBlobURL(base + '/ffmpeg-core.js', 'text/javascript'),
+    wasmURL: await toBlobURL(base + '/ffmpeg-core.wasm', 'application/wasm'),
+  });
+  for (const c of plan.clips) {
+    st('Lade Clip ' + c.name + ' …');
+    const d = new Uint8Array(await (await fetch(c.url)).arrayBuffer());
+    await ff.writeFile(c.name + '.mp4', d);
+    log(c.name + ': ' + (d.length / 1e6).toFixed(1) + ' MB');
+  }
+  await ff.writeFile('text.png', await textPng());
+  // Filter: jedes Segment zuschneiden, vereinheitlichen, dann aneinanderhängen
+  // ein Eingang je Segment (Clips dürfen mehrfach vorkommen), Startpunkt per -ss
+  const args = [];
+  plan.segs.forEach((s) => args.push('-ss', String(s.ss), '-t', String(s.t), '-i', s.clip + '.mp4'));
+  args.push('-loop', '1', '-t', '30', '-i', 'text.png');
+  const ti = plan.segs.length;
+  const parts = [];
+  plan.segs.forEach((s, i) => {
+    let f = `[${i}:v]setpts=PTS-STARTPTS,fps=30,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1,format=yuv420p`;
+    if (plan.text && s.clip === plan.text.clip) {
+      parts.push(`[${ti}:v]format=rgba,trim=duration=${s.t},fade=in:st=${plan.text.start}:d=0.8:alpha=1,setpts=PTS-STARTPTS[tx${i}]`);
+      f += `[b${i}];[b${i}][tx${i}]overlay=0:0:shortest=1,format=yuv420p`;
+    }
+    parts.push(f + `[v${i}]`);
+  });
+  const fc = parts.join(';') + ';' + plan.segs.map((_, i) => `[v${i}]`).join('') + `concat=n=${plan.segs.length}:v=1:a=0,fade=in:st=0:d=0.4[out]`;
+  args.push('-filter_complex', fc, '-map', '[out]', '-an', '-c:v', 'libx264', '-preset', plan.preset || 'ultrafast', '-crf', String(plan.crf || 23), '-pix_fmt', 'yuv420p', '-movflags', '+faststart', 'film.mp4');
+  log('ffmpeg ' + args.join(' '));
+  st('Kodiere …');
+  const t0 = performance.now();
+  const rc = await ff.exec(args);
+  if (rc !== 0) { st('Fehler beim Kodieren (Code ' + rc + ')'); throw new Error('ffmpeg ' + rc); }
+  const out = await ff.readFile('film.mp4');
+  window.__film = new Blob([out.buffer], { type: 'video/mp4' });
+  const v = document.createElement('video'); v.controls = true; v.src = URL.createObjectURL(window.__film); document.body.append(v);
+  st('Fertig: ' + (out.length / 1e6).toFixed(1) + ' MB in ' + Math.round((performance.now() - t0) / 1000) + ' s');
+  return { bytes: out.length, sec: Math.round((performance.now() - t0) / 1000) };
+};
+st('Bereit.');
+</script>
+</body>
+</html>
