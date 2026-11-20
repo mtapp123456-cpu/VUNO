@@ -31,7 +31,7 @@
     if (m && GRP.includes(m.group_type)) return m;
     const s = String(t.sport || '');
     const k = GRP.find(g => s.indexOf(LABEL[g]) === 0);
-    return k ? {group_type: k, discipline: '', age_min: null, age_max: null, gender: 'gemischt', level: ''} : null;
+    return k ? {group_type: k, discipline: (s.split(' · ')[1] || '').trim(), age_min: null, age_max: null, gender: 'gemischt', level: ''} : null;
   }
 
   // ---------- Teams-Seite ----------
