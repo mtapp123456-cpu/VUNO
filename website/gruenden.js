@@ -99,7 +99,7 @@
       box.addEventListener('change', onChange);
       box.addEventListener('submit', (e) => e.preventDefault());
     }
-    kids().forEach((c) => { c.dataset.ogHidden = c.hidden ? '1' : ''; c.hidden = true; });
+    kids().forEach((c) => { if (c.dataset.ogDisp === undefined) c.dataset.ogDisp = c.style.display || ''; c.style.display = 'none'; });
     box.hidden = false;
     if (!S.done) S.step = S.step || 1;
     render();
@@ -108,7 +108,7 @@
   }
   function back() {
     box.hidden = true;
-    kids().forEach((c) => { c.hidden = c.dataset.ogHidden === '1'; });
+    kids().forEach((c) => { c.style.display = c.dataset.ogDisp || ''; delete c.dataset.ogDisp; });
   }
   function reset() { if (box && !S.done) back(); }
 
@@ -263,8 +263,10 @@
       S.busy = true; render();
       try {
         const c = await supa();
-        const { data, error } = await c.auth.verifyOtp({ email: S.admin.email.trim(), token: S.code, type: 'email' });
-        if (error || !data.session) throw error || new Error('Keine Sitzung');
+        const email = S.admin.email.trim();
+        let { data, error } = await c.auth.verifyOtp({ email, token: S.code, type: 'email' });
+        if (error || !data?.session) ({ data, error } = await c.auth.verifyOtp({ email, token: S.code, type: 'signup' }));
+        if (error || !data?.session) throw error || new Error('Keine Sitzung');
         S.session = data.session; S.step = 4;
       } catch (x) { S.err = /expired|invalid/i.test(x?.message || '') ? 'Der Code stimmt nicht oder ist abgelaufen. Lass dir einen neuen schicken.' : 'Bestätigung hat nicht geklappt: ' + (x?.message || x); S.code = ''; }
       S.busy = false; render();

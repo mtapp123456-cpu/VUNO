@@ -350,3 +350,11 @@ Zusätzlich wurde direkt in der **Supabase-Datenbank** geändert (SQL-Editor). D
 - QR-Scan und Anmeldung mit Apple/Google/E-Mail sind nur Platzhalter.
 - Vorschau-Bereitstellungen bei Cloudflare (einladung, ohne-abo, startbild, v107) können gelöscht werden.
 - Weiterhin vor Live-Gang: `openAccess` in `config.js` auf `false` und in Supabase `update public.clubs set open_access = false;`.
+
+## 20.11.2026 – Verein gründen über die Website (Test)
+
+- Supabase: `supabase/migration_gruendung_website.sql` ausgeführt – neue Tabelle `club_setup` und Funktion `create_club_from_website(jsonb)` (legt Verein, Haupt-Admin, Abteilungen, Anlagen mit Teilflächen und 30-Tage-Lizenz an). Mit zurückgerolltem Probelauf geprüft.
+- Website (Repo ThomasWesolowski-web/OrgaMe, Branch `claude/verein-gruenden`, NICHT live): `public/gruenden.js` – nach „30 Tage kostenlos starten“: Verein → Haupt-Admin → E-Mail-Code → Bestätigen; `?test=1` = Testmodus. Kopie in `website/gruenden.js`.
+- App: `app/orgame-uebernahme.js` – Startbildschirm verlinkt „Verein gründen“ und „Testzugang“ auf die Website (alter Testverein-Zugang bleibt als kleiner Link), übernimmt die Anmeldung von der Website und öffnet den neuen Verein ohne Einrichtungsschritte. `?testverein=1` schaltet ein Gerät zurück auf den offenen Testverein.
+- Vorschauen: App https://gruendung.onbac.pages.dev · Website-Testkopie https://website-test.onbac.pages.dev/?test=1#preise (Branch `tmp-website-test` = gebaute Testkopie, nur für die Vorschau).
+- Offen: Live-Schaltung Website (Freigabe Tomek) und App (Freigabe Max), danach in der App `orgame-uebernahme.js` ohne `ORGAME_WEB`-Überschreibung (Standard https://orga.me/). Temporäre Branches `claude/testbuild` und `claude/testbuild-dist` im Website-Repo können gelöscht werden.
