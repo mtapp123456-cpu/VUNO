@@ -128,7 +128,7 @@
     openSheet('<form id="gr-form" novalidate>'
       + '<div class="sheet-head"><h3>Gruppe anlegen · ' + H(F.dep) + '</h3><button type="button" class="x" data-gr="close" aria-label="Schließen">✕</button></div>'
       + (discs.length ? '<label>Disziplin<select id="gr-disc" data-gr="disc"><option value="">Alle / keine</option>' + discs.map(x => '<option' + (x === F.disc ? ' selected' : '') + '>' + H(x) + '</option>').join('') + '</select></label>' : '')
-      + (T.length ? '<div class="gr-t">Vorlagen' + (F.sport ? ' für ' + H(F.sport.name) : '') + '</div><div class="gr-vl">' + T.map((g, i) => '<button type="button" data-gr="tpl" data-i="' + i + '" class="' + (i === F.pick ? 'on' : '') + '">' + H(g.name) + (g.level ? ' · ' + H(g.level) : '') + '</button>').join('') + '</div>' : '')
+      + (T.length ? '<div class="gr-t">Vorlagen' + (F.sport ? ' für ' + H(F.sport.name) : '') + '</div><div class="gr-vl">' + T.map((g, i) => '<button type="button" data-gr="tpl" data-i="' + i + '" class="' + (i === F.pick ? 'on' : '') + '">' + H(g.name) + (g.level ? ' · ' + H(g.level) : '') + (!F.disc && g.discipline ? ' (' + H(g.discipline) + ')' : '') + '</button>').join('') + '</div>' : '')
       + '<label>Name der Gruppe<input id="gr-name" maxlength="50" value="' + H(F.name) + '" placeholder="z. B. Jugend U15" autocomplete="off"></label>'
       + '<div class="gr-t">Art der Gruppe</div>' + seg('type', [['altersklasse', 'Altersklasse'], ['leistung', 'Leistungsgruppe'], ['kurs', 'Kurs']])
       + '<div class="row2"><label>Alter von<input id="gr-min" type="number" inputmode="numeric" min="0" max="120" value="' + H(F.min) + '" placeholder="offen"></label>'
@@ -138,7 +138,7 @@
       + '<label>Stufe <small style="opacity:.7">(freiwillig – z. B. RA 9–8, 8. Kyu, LK 5)</small><input id="gr-level" maxlength="40" value="' + H(F.level) + '" autocomplete="off"></label>'
       + '<p class="gr-msg" id="gr-msg">' + H(F.msg) + '</p>'
       + '<div class="sheet-actions"><button type="button" class="btn ghost" data-gr="close">Abbrechen</button><button type="button" class="btn" data-gr="save"' + (F.busy ? ' disabled' : '') + '>' + (F.busy ? 'Speichert …' : 'Gruppe speichern') + '</button></div>'
-      + (missing.length > 1 ? '<button type="button" class="gr-all" data-gr="all"' + (F.busy ? ' disabled' : '') + '>Alle ' + missing.length + ' Vorlagen auf einmal anlegen</button>' : '')
+      + (missing.length > 1 && (!discs.length || F.disc) ? '<button type="button" class="gr-all" data-gr="all"' + (F.busy ? ' disabled' : '') + '>Alle ' + missing.length + ' Vorlagen auf einmal anlegen</button>' : '')
       + '</form>');
   }
   function rowOf(g) {
