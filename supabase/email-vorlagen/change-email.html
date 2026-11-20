@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>OrgaMe</title>
+</head>
+<body style="margin:0;padding:0;background:#eef1f7;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#141a2b;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Code zur Bestätigung: {{ .Token }}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef1f7;padding:24px 12px;">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:18px;overflow:hidden;">
+      <tr><td style="background:#070b14;padding:22px 28px;" align="left">
+        <img src="https://onbac.pages.dev/onbac-logo.png" width="120" alt="OrgaMe" style="display:block;border:0;width:120px;height:auto;color:#ffffff;font-size:22px;font-weight:700;">
+      </td></tr>
+      <tr><td style="padding:28px 28px 8px;">
+        <h1 style="margin:0 0 10px;font-size:22px;line-height:1.3;color:#141a2b;">Neue E-Mail-Adresse bestätigen</h1>
+        <p style="margin:0 0 22px;font-size:16px;line-height:1.5;color:#3b4459;">Gib diesen Code in der OrgaMe-App ein, um {{ .NewEmail }} als neue Adresse für dein Konto zu bestätigen.</p>
+        <div style="text-align:center;margin:0 0 22px;">
+          <div style="display:inline-block;padding:16px 26px;border-radius:14px;background:#f2f6ff;border:1px solid #cddcff;font-size:32px;font-weight:800;letter-spacing:8px;color:#1E6BFF;font-family:'SFMono-Regular',Menlo,Consolas,monospace;">{{ .Token }}</div>
+        </div>
+        <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#5a6378;">Der Code gilt nur kurze Zeit und nur einmal. Ein Passwort brauchst du nicht.</p>
+        <p style="margin:0 0 24px;font-size:14px;line-height:1.5;color:#5a6378;">Falls du deine E-Mail-Adresse nicht ändern wolltest, ignoriere diese E-Mail. Deine bisherige Adresse bleibt gültig.</p>
+      </td></tr>
+      <tr><td style="padding:16px 28px 22px;border-top:1px solid #e6e9f0;font-size:12px;line-height:1.5;color:#8a92a6;">
+        OrgaMe – die Vereins-App · <a href="https://orga.me" style="color:#8a92a6;">orga.me</a><br>
+        Diese E-Mail wurde an {{ .Email }} gesendet.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
